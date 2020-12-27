@@ -1,13 +1,11 @@
 use rocket_contrib::json::JsonValue;
 
-#[get("/test")]
-fn test() -> JsonValue {
-    json!({
-        "api": "hello world"
-    })
+#[get("/tracks")]
+fn tracks() -> JsonValue {
+    success!([ "Track 1", "Track 2", "Track 3", "Track 4" ])
 }
 
 pub fn mount() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/api", routes![test])
+        .mount("/api", routes![tracks])
 }
