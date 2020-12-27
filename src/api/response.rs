@@ -1,5 +1,3 @@
-use rocket_contrib::json::JsonValue;
-
 /// Creates a JSON response containing some data
 /// # Arguments
 /// * `data` - A JSON object containing the data

@@ -2,14 +2,13 @@
 #[macro_use] extern crate rocket;
 #[macro_use] extern crate rocket_contrib;
 
-use std::io;
+use std::fs;
 use std::env;
-use std::fs::{self, DirEntry};
+use std::thread;
 use std::path::PathBuf;
-use rocket_contrib::serve::StaticFiles;
 
 mod api;
-mod discord;
+mod bot;
 
 #[derive(Debug)]
 struct Track {
@@ -21,19 +20,13 @@ fn get_tracks_in_dir(dir: &str) -> Result<Vec<Track>, String> {
     let mut tracks = Vec::new();
 
     match fs::read_dir(path) {
-        Err(why) => println!("error"),
+        Err(why) => println!("Failed to read tracks in {}:\n{}", dir, why),
         Ok(paths) => for path in paths {
             tracks.push(Track { name: path.unwrap().path() });
         },
     }
 
     Ok(tracks)
-}
-
-fn start_webserver() {
-    api::routes::mount()
-        .mount("/", StaticFiles::from(concat!(env!("CARGO_MANIFEST_DIR"), "/public")))
-        .launch();
 }
 
 fn main() {
@@ -43,7 +36,8 @@ fn main() {
     println!("{:?}", track_list.unwrap());
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
+    let api_thread = thread::spawn(||api::start());
 
-    discord::bot::start(token);
-    start_webserver();
+    bot::start(token);
+    api_thread.join().unwrap();
 }
