@@ -1,0 +1,28 @@
+{
+  "name": "discord-soundboard-rs",
+  "version": "1.0.0",
+  "description": "Discord soundboard bot with a web interface",
+  "main": "index.js",
+  "repository": "git@github.com:johanengstrand/discord-soundboard-rs.git",
+  "author": "Johan Engstrand <johan@engstrand.nu>",
+  "contributors": [
+    {
+      "name": "Fredrik Engstrand",
+      "email": "fredrik@engstrand.nu"
+    }
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^11.0.1",
+    "rollup-plugin-svelte": "^7.0.0",
+    "svelte": "^3.31.0",
+    "svelte-preprocess": "^4.6.1"
+  },
+  "dependencies": {
+    "rollup": "^2.35.1"
+  },
+  "scripts": {
+    "server": "DISCORD_TOKEN=addtoken cargo watch -x run -w src",
+    "client": "npx rollup -cw"
+  }
+}
