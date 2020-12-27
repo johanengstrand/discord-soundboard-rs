@@ -3,12 +3,9 @@
 // The voice client can be retrieved in any command using `songbird::get(ctx).await`.
 use songbird::SerenityInit;
 
-// Import the `Context` to handle commands.
-use serenity::client::Context;
-
 use serenity::{
     async_trait,
-    client::{Client, EventHandler},
+    client::{Client, Context, EventHandler},
     framework::{
         StandardFramework,
         standard::{
@@ -16,7 +13,8 @@ use serenity::{
             macros::{command, group},
         },
     },
-    model::{channel::Message, gateway::Ready},
+    http::{client::Http, GuildPagination},
+    model::{channel::Message, gateway::Ready, id::GuildId},
     Result as SerenityResult,
 };
 
@@ -49,8 +47,9 @@ pub async fn start(token: String) {
         .await
         .expect("Err creating client");
 
+    let http = Http::new_with_token(&token);
+
     let _ = client.start().await.map_err(|why| println!("Client ended: {:?}", why));
-    println!("Starting");
 }
 
 #[command]
