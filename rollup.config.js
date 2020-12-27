@@ -10,11 +10,11 @@ export default {
     name: 'ui'
   },
   plugins: [
-    svelte({ preprocess: autoPreprocess() }),
     resolve({
       extensions: ['.js', '.svelte'],
       browser: true,
       dedupe: ['svelte'],
     }),
+    svelte({ emitCss: false, preprocess: autoPreprocess() }),
   ]
 }
