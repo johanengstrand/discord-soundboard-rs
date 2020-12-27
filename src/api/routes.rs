@@ -1,8 +1,14 @@
+use crate::bot;
 use rocket_contrib::json::JsonValue;
 
 #[get("/tracks")]
 fn tracks() -> JsonValue {
-    success!([ "Track 1", "Track 2", "Track 3", "Track 4" ])
+    let track_list = bot::tracks::get_tracks_in_dir("/home/johan/nextcloud/VERY_IMPORTANT_FILES");
+
+    match track_list {
+        Ok(tracks) => success!(tracks),
+        Err(why) => failure!(why),
+    }
 }
 
 pub fn mount() -> rocket::Rocket {

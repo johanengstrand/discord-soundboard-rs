@@ -415,6 +415,7 @@ dependencies = [
  "futures",
  "rocket",
  "rocket_contrib",
+ "serde",
  "serenity",
  "songbird",
  "tokio",
