@@ -22,7 +22,8 @@
     "rollup": "^2.35.1"
   },
   "scripts": {
-    "server": "DISCORD_TOKEN=addtoken cargo watch -x run -w src",
+    "server": "cargo watch -x run -w src",
     "client": "npx rollup -cw"
   }
 }
+
