@@ -14,7 +14,8 @@ fn visit_dirs(dir: &PathBuf, category: &PathBuf, tracks: &mut Vec<Track>) -> io:
         for entry in fs::read_dir(dir)? {
             let entry = entry?;
             let path = entry.path();
-            let file_name = entry.file_name().into_string().unwrap();
+            let file_name = entry.file_name().into_string()
+                .expect("Could not convert file name to string");
             if file_name.get(0..1) != Some(".") {
                 if path.is_dir() {
                     visit_dirs(&path, &category.join(file_name), tracks)?;
