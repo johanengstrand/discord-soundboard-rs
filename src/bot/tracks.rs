@@ -15,14 +15,16 @@ fn visit_dirs(dir: &PathBuf, category: &PathBuf, tracks: &mut Vec<Track>) -> io:
             let entry = entry?;
             let path = entry.path();
             let file_name = entry.file_name().into_string().unwrap();
-            if path.is_dir() {
-                visit_dirs(&path, &category.join(file_name), tracks)?;
-            } else {
-                tracks.push(Track {
-                    name: file_name,
-                    category: category.to_path_buf(),
-                    path: path,
-                });
+            if file_name.get(0..1) != Some(".") {
+                if path.is_dir() {
+                    visit_dirs(&path, &category.join(file_name), tracks)?;
+                } else {
+                    tracks.push(Track {
+                        name: file_name,
+                        category: category.to_path_buf(),
+                        path: path,
+                    });
+                }
             }
         }
         Ok(())
