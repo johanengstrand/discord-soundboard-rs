@@ -10,6 +10,8 @@ pub mod tracks;
 pub mod guilds;
 pub mod playback;
 
+use crate::CONFIG;
+
 struct Handler;
 
 #[async_trait]
@@ -20,15 +22,15 @@ impl EventHandler for Handler {
 }
 
 #[tokio::main]
-pub async fn start(token: String) {
+pub async fn start() {
     tracing_subscriber::fmt::init();
 
-    let mut client = Client::builder(&token)
+    let mut client = Client::builder(&CONFIG.token)
         .event_handler(Handler)
         .register_songbird()
         .await
         .expect("Failed to create discord client");
 
-    let http = Http::new_with_token(&token);
+    let http = Http::new_with_token(&CONFIG.token);
     let _ = client.start().await.map_err(|why| println!("Client ended: {:?}", why));
 }

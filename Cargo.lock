@@ -436,6 +436,7 @@ version = "0.1.0"
 dependencies = [
  "config",
  "futures",
+ "lazy_static",
  "rocket",
  "rocket_contrib",
  "serde 1.0.118",
