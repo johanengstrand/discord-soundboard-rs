@@ -1,6 +1,6 @@
 <script>
-  import { playTrack } from '../lib/api';
   import { currentlyPlaying } from '../store';
+  import { playTrack, stopTrack } from '../lib/api';
 
   let active = false;
   export let track;
@@ -20,8 +20,16 @@
       return;
     }
 
-    playTrack(track.path);
-    currentlyPlaying.set(track.name);
+    // TODO: Handle response from API call
+    if ($currentlyPlaying == track.name) {
+      stopTrack();
+      currentlyPlaying.set(null);
+    } else {
+      playTrack(track.path);
+      currentlyPlaying.set(track.name);
+    }
+
+    active = true;
   }
 
   currentlyPlaying.subscribe(name => {

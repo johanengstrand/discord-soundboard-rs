@@ -41,9 +41,16 @@ export async function fetchTracks() {
   return await get('tracks');
 }
 
-/// @brief Fetches all available tracks from the server
-/// @throws Error if the tracks could not be fetched
-/// @returns Object containing the path of all available tracks
+/// @brief Attempts playback of a track based on the file path
+/// @throws Error if the track could not be played
+/// @returns Object containing metadata about the track
 export async function playTrack(path) {
   return await post('play', path);
+}
+
+/// @brief Stops the playback of a track
+/// @throws Error if the current track could not be stopped
+/// @returns nothing
+export async function stopTrack() {
+  return await post('stop', {});
 }
