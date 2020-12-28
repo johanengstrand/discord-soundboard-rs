@@ -13,6 +13,7 @@ tracing-futures = "0.2"
 rocket = "0.4.6"
 futures = "0.3.8"
 serde = { version = "1.0", features = ["derive"] }
+config = "0.10"
 
 [dependencies.songbird]
 git = "https://github.com/serenity-rs/songbird"
