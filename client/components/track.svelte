@@ -87,7 +87,7 @@
 <article on:mouseenter={enter} on:mouseleave={leave} on:click={() => attemptPlayback()} class:active>
   <div class="content">
     <div class="metadata">
-      <h4>{track.name}</h4>
+      <h4>{track.name.substr(0, track.name.lastIndexOf('.'))}</h4>
       <p>{track.category}</p>
     </div>
     {#if active || $currentlyPlaying == track.name}
