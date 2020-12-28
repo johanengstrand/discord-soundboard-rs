@@ -1,13 +1,15 @@
 <script>
   import Button from './button.svelte';
   import NavItem from './nav-item.svelte';
+  import FilterInput from './tracks-filter-input.svelte';
+  import { filterQuery } from '../store';
 
   function filterFavorites() {
-    console.log("favorites");
+    filterQuery.set('favorites');
   }
 
   function showCategories() {
-    console.log("categories");
+    console.log('categories');
   }
 </script>
 
@@ -31,10 +33,6 @@
     flex: 1;
   }
 
-  input {
-    flex: 2;
-  }
-
   nav {
     height: 100%;
     display: inline-flex;
@@ -44,7 +42,7 @@
 
 <header>
   <h3>Discord soundboard</h3>
-  <input type="text" placeholder="Filter tracks" />
+  <FilterInput />
   <nav>
     <NavItem label='Favorites' callback={filterFavorites} />
     <NavItem label='Categories' callback={showCategories} />

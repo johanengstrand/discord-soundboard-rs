@@ -1,6 +1,7 @@
 <script>
-  import Track from './track.svelte';
   import Header from './header.svelte';
+  import TracksFilterContainer from './tracks-filter-container.svelte';
+
   import { fetchTracks } from '../lib/api';
 </script>
 
@@ -63,18 +64,8 @@
   }
 
   main {
-    display: grid;
-    flex-wrap: wrap;
-    flex-direction: column;
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr;
-    column-gap: var(--spacing);
-    row-gap: var(--spacing);
-    width: 100%;
-    padding: 0 var(--spacing);
     padding-bottom: var(--spacing);
     margin-top: calc(var(--header-height) + var(--spacing));
-    box-sizing: border-box;
   }
 </style>
 
@@ -83,9 +74,7 @@
   {#await fetchTracks()}
     <p>Fetching tracks..</p>
   {:then tracks}
-    {#each tracks as track}
-      <Track {track} />
-    {/each}
+    <TracksFilterContainer tracks={tracks} />
   {:catch error}
     <p>{error.message}</p>
   {/await}
