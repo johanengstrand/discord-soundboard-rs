@@ -2,7 +2,7 @@
   import { filterQuery } from '../store';
 
   function resetFilterQuery() {
-    filterQuery.set(null);
+    filterQuery.set('');
   }
 </script>
 
@@ -34,7 +34,7 @@
 
 <div>
   <input type="text" placeholder="Filter tracks" bind:value={$filterQuery}/>
-  {#if $filterQuery != null}
+  {#if $filterQuery != ''}
     <button on:click={resetFilterQuery}>&#10799;</button>
   {/if}
 </div>

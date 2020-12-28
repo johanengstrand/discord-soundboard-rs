@@ -7,7 +7,7 @@
   export let tracks;
 
   function filterTracks(query) {
-    if (!query ) {
+    if (query == '') {
       filteredTracks = tracks;
       return;
     }
