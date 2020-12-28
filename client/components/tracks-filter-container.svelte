@@ -27,8 +27,8 @@
     filteredTracks = tracksToFilter.filter(track => {
       const { name, category } = track;
 
-      if (name.length < queryLength || name.substring(0, queryLength) != query) {
-        if (category.length < queryLength || category.substring(0, queryLength) != query) {
+      if (name.length < queryLength || !name.includes(query)) {
+        if (category.length < queryLength || !category.includes(query)) {
           return false;
         }
       }
