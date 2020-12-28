@@ -1,7 +1,7 @@
 <script>
   import { playTrack } from '../lib/api';
 
-  export let path;
+  export let track;
 </script>
 
 <style>
@@ -29,8 +29,8 @@
   }
 </style>
 
-<article on:click={() => playTrack({ path })}>
-  <h4>{path.substr(path.lastIndexOf('/') + 1)}</h4>
-  <p>{path}</p>
+<article on:click={() => playTrack({ track })}>
+  <h4>{track.name}</h4>
+  <p>{track.category}</p>
 </article>
 

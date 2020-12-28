@@ -72,6 +72,7 @@
     row-gap: var(--spacing);
     width: 100%;
     padding: 0 var(--spacing);
+    padding-bottom: var(--spacing);
     margin-top: calc(var(--header-height) + var(--spacing));
     box-sizing: border-box;
   }
@@ -83,7 +84,7 @@
     <p>Fetching tracks..</p>
   {:then tracks}
     {#each tracks as track}
-      <Track path={track} />
+      <Track {track} />
     {/each}
   {:catch error}
     <p>{error.message}</p>
