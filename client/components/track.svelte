@@ -1,6 +1,6 @@
 <script>
-  import { playTrack } from '../lib/api';
   import { currentlyPlaying } from '../store';
+  import { playTrack, stopTrack } from '../lib/api';
 
   let active = false;
   export let track;
@@ -20,8 +20,16 @@
       return;
     }
 
-    playTrack(track.path);
-    currentlyPlaying.set(track.name);
+    // TODO: Handle response from API call
+    if ($currentlyPlaying == track.name) {
+      stopTrack();
+      currentlyPlaying.set(null);
+    } else {
+      playTrack(track.path);
+      currentlyPlaying.set(track.name);
+    }
+
+    active = true;
   }
 
   currentlyPlaying.subscribe(name => {
@@ -79,7 +87,7 @@
 <article on:mouseenter={enter} on:mouseleave={leave} on:click={() => attemptPlayback()} class:active>
   <div class="content">
     <div class="metadata">
-      <h4>{track.name}</h4>
+      <h4>{track.name.substr(0, track.name.lastIndexOf('.'))}</h4>
       <p>{track.category}</p>
     </div>
     {#if active || $currentlyPlaying == track.name}

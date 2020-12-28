@@ -18,9 +18,8 @@
     --hover-background: rgba(0, 0, 0, 0.1);
     --spacing: 1rem;
     --spacing-sm: 0.5rem;
-    --header-height: calc(1.5rem + 2 * (var(--spacing)));
+    --header-height: calc(1.2rem + 2 * (var(--spacing)));
     --border-radius: 5px;
-    --border-radius-sm: 3px;
     --box-shadow: 1px 1px 10px black;
     --transition-time: 0.1s;
   }
@@ -54,7 +53,7 @@
     background-color: var(--accent-hover-background-light);
     border: 1px solid var(--accent-border-color);
     color: var(--accent-background);
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--border-radius);
     padding: var(--spacing-sm) var(--spacing);
     transition: background-color var(--transition-time);
   }
@@ -66,6 +65,13 @@
   main {
     padding-bottom: var(--spacing);
     margin-top: calc(var(--header-height) + var(--spacing));
+  }
+
+  @media screen and (max-width: 400px) {
+    main {
+      padding-bottom: var(--spacing-sm);
+      margin-top: calc(var(--header-height) + var(--spacing-sm));
+    }
   }
 </style>
 

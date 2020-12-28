@@ -39,6 +39,23 @@
     display: inline-flex;
     justify-content: flex-end;
   }
+
+  @media screen and (max-width: 900px) {
+    h3, nav {
+      flex: 0;
+    }
+
+    h3 {
+      white-space: nowrap;
+      margin-right: var(--spacing-sm);
+    }
+  }
+
+  @media screen and (max-width: 650px) {
+    h3 {
+      display: none;
+    }
+  }
 </style>
 
 <header>

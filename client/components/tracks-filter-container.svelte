@@ -53,6 +53,25 @@
     padding: 0 var(--spacing);
     box-sizing: border-box;
   }
+
+  @media screen and (max-width: 900px) {
+    div {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 550px) {
+    div {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    div {
+      padding: 0 var(--spacing-sm);
+      row-gap: var(--spacing-sm);
+    }
+  }
 </style>
 
 <div>
