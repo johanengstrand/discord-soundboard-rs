@@ -27,6 +27,7 @@
     top: 0;
     background-color: var(--accent-background-light);
     color: var(--accent-background);
+    z-index: 10;
   }
 
   h3, nav {
