@@ -1,9 +1,15 @@
 <script>
   import { filterQuery } from '../store';
 
+  let active = false;
+
   function resetFilterQuery() {
     filterQuery.set('');
   }
+
+  filterQuery.subscribe(query => {
+    active = query != "";
+  });
 </script>
 
 <style>
@@ -33,7 +39,7 @@
 </style>
 
 <div>
-  <input type="text" placeholder="Filter tracks" bind:value={$filterQuery}/>
+  <input type="text" placeholder="Filter tracks" bind:value={$filterQuery} class:active />
   {#if $filterQuery != ''}
     <button on:click={resetFilterQuery}>&#10799;</button>
   {/if}

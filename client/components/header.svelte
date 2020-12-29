@@ -1,5 +1,4 @@
 <script>
-  import Button from './button.svelte';
   import NavItem from './nav-item.svelte';
   import FilterInput from './tracks-filter-input.svelte';
   import { filterQuery } from '../store';
@@ -15,19 +14,16 @@
 
 <style>
   header {
-    padding: 0 var(--spacing);
+    padding: var(--spacing-md) var(--spacing);
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
     column-gap: var(--spacing-sm);
     width: 100%;
-    height: var(--header-height);
     box-sizing: border-box;
-    position: fixed;
-    top: 0;
-    background-color: var(--accent-background-light);
-    color: var(--accent-background);
-    z-index: 10;
+    background-color: var(--background);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--background-light);
   }
 
   h3, nav {
@@ -38,6 +34,7 @@
     height: 100%;
     display: inline-flex;
     justify-content: flex-end;
+    column-gap: var(--spacing-xsm);
   }
 
   @media screen and (max-width: 900px) {
@@ -54,6 +51,12 @@
   @media screen and (max-width: 650px) {
     h3 {
       display: none;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    header {
+      padding: var(--spacing-sm) var(--spacing-sm);
     }
   }
 </style>

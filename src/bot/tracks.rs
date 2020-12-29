@@ -5,7 +5,7 @@ use std::io::{self, Error, ErrorKind};
 #[derive(Debug, Serialize)]
 pub struct Track {
     name: String,
-    category: PathBuf,
+    categories: Vec<PathBuf>,
     path: PathBuf,
 }
 
@@ -14,17 +14,16 @@ fn visit_dirs(dir: &PathBuf, category: &PathBuf, tracks: &mut Vec<Track>) -> io:
         for entry in fs::read_dir(dir)? {
             let entry = entry?;
             let path = entry.path();
-            let file_name = entry.file_name().into_string()
+            let name = entry.file_name().into_string()
                 .expect("Could not convert file name to string");
-            if file_name.get(0..1) != Some(".") {
+            if name.get(0..1) != Some(".") {
                 if path.is_dir() {
-                    visit_dirs(&path, &category.join(file_name), tracks)?;
+                    visit_dirs(&path, &category.join(name), tracks)?;
                 } else {
-                    tracks.push(Track {
-                        name: file_name,
-                        category: category.to_path_buf(),
-                        path: path,
-                    });
+                    // TODO: Add 'favorites' category if track is a favorite
+                    let keyword = category.to_path_buf();
+                    let categories = vec!(keyword);
+                    tracks.push(Track { name, categories, path });
                 }
             }
         }

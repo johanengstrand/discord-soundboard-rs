@@ -1,6 +1,7 @@
 <script>
   import { currentlyPlaying } from '../store';
   import { playTrack, stopTrack } from '../lib/api';
+  import TrackCategory from './track-category.svelte';
 
   let active = false;
   export let track;
@@ -35,6 +36,8 @@
   currentlyPlaying.subscribe(name => {
     active = name == track.name;
   });
+
+  active = $currentlyPlaying == track.name;
 </script>
 
 <style>
@@ -44,10 +47,10 @@
     padding: var(--spacing-sm) var(--spacing);
     margin: 0;
     border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
     min-width: 33%;
     cursor: pointer;
     position: relative;
+    box-shadow: 2px 2px 10px #0c0f13;
     transition: background-color var(--transition-time);
   }
 
@@ -68,6 +71,13 @@
     white-space: nowrap;
   }
 
+  .categories {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    column-gap: var(--spacing-xsm);
+  }
+
   h4, p {
     margin: 0;
   }
@@ -84,22 +94,27 @@
   }
 </style>
 
-<article on:mouseenter={enter} on:mouseleave={leave} on:click={() => attemptPlayback()} class:active>
+<article on:mouseenter={enter} on:mouseleave={leave} on:click={() => attemptPlayback()} class:active={$currentlyPlaying == track.name}>
   <div class="content">
-    <div class="metadata">
+    <section class="metadata">
       <h4>{track.name.substr(0, track.name.lastIndexOf('.'))}</h4>
-      <p>{track.category}</p>
-    </div>
+      <section class="categories">
+        {#each track.categories as category}
+          <TrackCategory label={category} favorite={category == 'favorite'} />
+        {/each}
+      </section>
+    </section>
     {#if active || $currentlyPlaying == track.name}
       {#if $currentlyPlaying == track.name}
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
         </svg>
       {:else}
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                 d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       {/if}
     {/if}

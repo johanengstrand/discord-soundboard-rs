@@ -12,10 +12,7 @@
       return;
     }
 
-
     let tracksToFilter = tracks;
-    const queryLength = query.length;
-
     // Only search through already filtered tracks if we simply extend the previous query
     if (previousQuery && query.substring(0, previousQuery.length) == previousQuery) {
       tracksToFilter = filteredTracks;
@@ -25,15 +22,20 @@
     previousQuery = query;
 
     filteredTracks = tracksToFilter.filter(track => {
-      const { name, category } = track;
+      const { name, categories } = track;
 
-      if (name.length < queryLength || !name.includes(query)) {
-        if (category.length < queryLength || !category.includes(query)) {
-          return false;
+      if (name.length >= query.length && name.includes(query)) {
+        return true;
+      }
+
+      // Check if any of the tracks categories match the query
+      for (const category of categories) {
+        if (category.length >= query.length && category.includes(query)) {
+          return true;
         }
       }
 
-      return true;
+      return false;
     });
   }
 

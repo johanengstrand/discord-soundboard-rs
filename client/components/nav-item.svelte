@@ -1,26 +1,26 @@
 <script>
-  import Button from './button.svelte';
-
   export let label;
   export let callback;
 </script>
 
 <style>
   button {
-    color: var(--accent-background);
+    color: var(--text-color);
     background-color: transparent;
-    border-radius: 0;
-    border: none;
-    border-left: 1px solid var(--accent-border-color);
     text-transform: uppercase;
+    padding: var(--spacing-sm);
   }
 
-  button:last-of-type {
-    border-right: 1px solid var(--accent-border-color);
-  }
-
-  button:hover {
-    background-color: var(--hover-background);
+  button:hover::after, button:focus::after {
+    content: '';
+    position: absolute;
+    bottom: -0.3rem;
+    left: 0px;
+    background-color: var(--accent-color);
+    width: calc(100% - 3rem);
+    height: 0.3rem;
+    margin: 0 1.5rem;
+    border-radius: var(--border-radius);
   }
 </style>
 
