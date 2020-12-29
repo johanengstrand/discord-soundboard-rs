@@ -14,10 +14,10 @@
 #[macro_export]
 macro_rules! success {
     ($input:expr) => {
-        json!({
+        Ok(warp::reply::json(&serde_json::json!({
             "success": true,
             "data": $input
-        })
+        })))
     }
 }
 
@@ -37,9 +37,9 @@ macro_rules! success {
 #[macro_export]
 macro_rules! failure {
     ($input:expr) => {
-        json!({
+        Ok(warp::reply::json(&serde_json::json!({
             "success": false,
             "error": $input
-        })
+        })))
     }
 }

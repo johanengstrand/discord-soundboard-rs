@@ -1,10 +1,9 @@
-use rocket_contrib::serve::StaticFiles;
+use std::sync::{Arc, Mutex};
+use serenity::http::Http;
 
 #[macro_use] pub mod response;
 pub mod routes;
 
-pub fn start() {
-    routes::mount()
-        .mount("/", StaticFiles::from(concat!(env!("CARGO_MANIFEST_DIR"), "/public")))
-        .launch();
+pub struct Handles {
+    pub http: Arc<Http>,
 }
