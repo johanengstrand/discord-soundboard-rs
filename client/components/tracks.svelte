@@ -1,5 +1,5 @@
 <script>
-  import Track from './track.svelte';
+  import Track from './track';
   import { filterQuery } from '../store';
 
   let previousQuery;
@@ -77,7 +77,7 @@
 </style>
 
 <div>
-  {#each filteredTracks as track}
+  {#each filteredTracks as track, i (track.path)}
     <Track {track} />
   {/each}
 </div>

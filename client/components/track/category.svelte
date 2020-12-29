@@ -1,10 +1,17 @@
 <script>
+  import { filterQuery } from '../../store';
+
   export let label;
   export let favorite;
+
+  function onClick(e) {
+    e.stopPropagation();
+    filterQuery.set(label);
+  }
 </script>
 
 <style>
-  p {
+  button {
     padding: 0.15rem 0.4rem;
     background-color: var(--tag-color);
     color: var(--tag-text-color);
@@ -14,6 +21,12 @@
     font-size: 0.8rem;
     text-transform: uppercase;
     font-weight: bold;
+    transition: background-color color var(--transition-time);
+  }
+
+  button:hover {
+    background-color: var(--tag-text-color);
+    color: var(--tag-color);
   }
 
   .favorite {
@@ -22,10 +35,10 @@
   }
 </style>
 
-<p class:favorite>
+<button class:favorite on:click={onClick}>
   {#if favorite}
     favorite
   {:else}
     {label}
   {/if}
-</p>
+</button>

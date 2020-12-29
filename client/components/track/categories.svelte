@@ -1,0 +1,21 @@
+<script>
+  import TrackCategory from './category';
+  import { FAVORITES_CATEGORY } from '../../constants';
+
+  export let categories;
+</script>
+
+<style>
+  .categories {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    column-gap: var(--spacing-xsm);
+  }
+</style>
+
+<section class="categories">
+  {#each categories as category}
+    <TrackCategory label={category} favorite={category == FAVORITES_CATEGORY} />
+  {/each}
+</section>

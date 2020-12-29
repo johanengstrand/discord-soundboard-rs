@@ -1,14 +1,28 @@
 <script>
-  import NavItem from './nav-item.svelte';
-  import FilterInput from './tracks-filter-input.svelte';
-  import { filterQuery } from '../store';
+  import {
+    FAVORITES_CATEGORY,
+    NAV_ITEM_FAVORITES,
+    NAV_ITEM_CATEGORIES
+  } from '../../constants';
+  import { filterQuery, currentNavItem } from '../../store';
+
+  import NavItem from './nav-item';
+  import FilterInput from './tracks-filter-input';
 
   function filterFavorites() {
-    filterQuery.set('favorites');
+    filterQuery.set(FAVORITES_CATEGORY);
+  }
+
+  function filterReset() {
+    filterQuery.set('');
   }
 
   function showCategories() {
-    console.log('categories');
+    console.log('show categories');
+  }
+
+  function hideCategories() {
+    console.log('hide categories');
   }
 </script>
 
@@ -65,7 +79,7 @@
   <h3>Discord soundboard</h3>
   <FilterInput />
   <nav>
-    <NavItem label='Favorites' callback={filterFavorites} />
-    <NavItem label='Categories' callback={showCategories} />
+    <NavItem label={NAV_ITEM_FAVORITES} callbackActive={filterFavorites} callbackInactive={filterReset} />
+    <NavItem label={NAV_ITEM_CATEGORIES} callbackActive={showCategories} callbackInactive={hideCategories} />
   </nav>
 </header>

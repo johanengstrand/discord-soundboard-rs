@@ -1,8 +1,8 @@
 <script>
-  import Header from './header.svelte';
-  import TracksFilterContainer from './tracks-filter-container.svelte';
+  import Header from './header';
+  import Tracks from './tracks';
 
-  import { fetchTracks } from '../lib/api';
+  import { fetchTracks } from '../api';
 </script>
 
 <style>
@@ -25,6 +25,8 @@
     --spacing-md: 0.75rem;
     --header-height: calc(1.5rem + 2 * (var(--spacing)));
     --border-radius: 5px;
+    --font-size: 1rem;
+    --font-size-sm: 0.9rem;
     --box-shadow: 1px 1px 10px black;
     --transition-time: 0.1s;
   }
@@ -35,6 +37,7 @@
     background-color: var(--background);
     color: var(--text-color);
     font-family: mono;
+    font-size: var(--font-size);
     display: flex;
     flex-direction: column;
   }
@@ -48,6 +51,7 @@
     cursor: pointer;
     color: var(--text-color);
     font-weight: bold;
+    font-size: var(--font-size-sm);
     padding: var(--spacing-sm) var(--spacing);
     border: none;
     position: relative;
@@ -62,6 +66,7 @@
     border-radius: var(--border-radius);
     padding: var(--spacing-sm) var(--spacing);
     font-family: inherit;
+    font-size: var(--font-size);
     transition: border-color var(--transition-time);
   }
 
@@ -88,7 +93,7 @@
   {#await fetchTracks()}
     <p>Fetching tracks..</p>
   {:then tracks}
-    <TracksFilterContainer tracks={tracks} />
+    <Tracks tracks={tracks} />
   {:catch error}
     <p>{error.message}</p>
   {/await}

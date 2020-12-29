@@ -54,3 +54,17 @@ export async function playTrack(path) {
 export async function stopTrack() {
   return await post('stop', {});
 }
+
+/// @brief Favorites a track and saves it on the server
+/// @throws Error if the track could not be added to the favorite category
+/// @returns nothing
+export async function favoriteTrack(track) {
+  return await post('favorite', track);
+}
+
+/// @brief Unfavorites a track and saves it on the server
+/// @throws Error if the track could not be removed from the favorite category
+/// @returns nothing
+export async function unfavoriteTrack(track) {
+  return await post('unfavorite', track);
+}
