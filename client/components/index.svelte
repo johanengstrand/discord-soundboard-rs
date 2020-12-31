@@ -3,6 +3,27 @@
   import Tracks from './tracks';
 
   import { fetchTracks } from '../api';
+  import { currentCategories } from '../store';
+
+  async function fetchAndParseTracks() {
+    const tracks = await fetchTracks();
+    const parsedCategories = {
+      favorite: [], // always create a favorites category even if empty
+    };
+
+    for (const track of tracks) {
+      for (const category of track.categories) {
+        if (parsedCategories.hasOwnProperty(category)) {
+          parsedCategories[category].push(track);
+        } else {
+          parsedCategories[category] = [track];
+        }
+      }
+    }
+
+    currentCategories.set(parsedCategories);
+    return tracks;
+  }
 </script>
 
 <style>
@@ -90,7 +111,7 @@
 
 <Header />
 <main>
-  {#await fetchTracks()}
+  {#await fetchAndParseTracks()}
     <p>Fetching tracks..</p>
   {:then tracks}
     <Tracks tracks={tracks} />

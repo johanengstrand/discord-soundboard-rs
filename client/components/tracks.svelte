@@ -1,42 +1,27 @@
 <script>
   import Track from './track';
-  import { filterQuery } from '../store';
+  import { QUERY_TYPE } from '../constants';
+  import { filterQuery, currentCategories } from '../store';
+  import { customFiltering, categoryFiltering } from '../filtering';
 
   let previousQuery;
   let filteredTracks;
   export let tracks;
 
-  function filterTracks(query) {
-    if (query == '') {
+  function filterTracks(queryData) {
+    if (!queryData || queryData.type == QUERY_TYPE.EMPTY) {
       filteredTracks = tracks;
       return;
     }
 
-    let tracksToFilter = tracks;
-    // Only search through already filtered tracks if we simply extend the previous query
-    if (previousQuery && query.substring(0, previousQuery.length) == previousQuery) {
-      tracksToFilter = filteredTracks;
+    const { type, query } = queryData;
+    if (type == QUERY_TYPE.CATEGORY) {
+      filteredTracks = categoryFiltering(tracks, query, $currentCategories);
+    } else {
+      filteredTracks = customFiltering(tracks, filteredTracks, query, previousQuery);
     }
 
-    // Save the current query before filtering
     previousQuery = query;
-
-    filteredTracks = tracksToFilter.filter(track => {
-      const { name, categories } = track;
-
-      if (name.length >= query.length && name.includes(query)) {
-        return true;
-      }
-
-      // Check if any of the tracks categories match the query
-      for (const category of categories) {
-        if (category.length >= query.length && category.includes(query)) {
-          return true;
-        }
-      }
-
-      return false;
-    });
   }
 
   filterQuery.subscribe(filterTracks);

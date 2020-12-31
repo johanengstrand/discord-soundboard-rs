@@ -15,7 +15,7 @@
 </style>
 
 <section class="categories">
-  {#each categories as category}
+  {#each categories as category, i (category)}
     <TrackCategory label={category} favorite={category == FAVORITES_CATEGORY} />
   {/each}
 </section>

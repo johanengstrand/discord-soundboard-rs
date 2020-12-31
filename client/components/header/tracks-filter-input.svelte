@@ -1,16 +1,17 @@
 <script>
   import debounce from '../../debounce';
   import { NAV_ITEM_FAVORITES } from '../../constants';
+  import { createEmptyQuery, createCustomQuery } from '../../filtering';
   import { filterQuery, currentNavItem } from '../../store';
 
   let active = false;
 
   const handleInput = debounce(e => {
-    filterQuery.set(e.target.value);
+    filterQuery.set(createCustomQuery(e.target.value));
 	}, 125)
 
   function resetFilterQuery() {
-    filterQuery.set('');
+    filterQuery.set(createEmptyQuery());
 
     // Reset the currently selected nav item if the favorites item is chosen
     if ($currentNavItem == NAV_ITEM_FAVORITES) {
@@ -18,8 +19,8 @@
     }
   }
 
-  filterQuery.subscribe(query => {
-    active = query != "";
+  filterQuery.subscribe(queryData => {
+    active = queryData.query != '';
   });
 </script>
 
@@ -50,8 +51,8 @@
 </style>
 
 <div>
-  <input type="text" placeholder="Filter tracks" on:input={handleInput} class:active value={$filterQuery} />
-  {#if $filterQuery != ''}
+  <input type="text" placeholder="Filter tracks" on:input={handleInput} class:active value={$filterQuery.query} />
+  {#if $filterQuery.query != ''}
     <button on:click={resetFilterQuery}>&#10799;</button>
   {/if}
 </div>

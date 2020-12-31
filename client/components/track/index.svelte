@@ -5,7 +5,7 @@
     favoriteTrack,
     unfavoriteTrack,
   } from '../../api';
-  import { currentTrack } from '../../store';
+  import { currentTrack, currentCategories } from '../../store';
   import { FAVORITES_CATEGORY } from '../../constants';
   import TrackCategories from './categories';
 
@@ -33,15 +33,22 @@
   function toggleFavorite(e) {
     // Prevent event propagation to 'attemptPlayback'
     e.stopPropagation();
+    const categories = $currentCategories;
 
     if (favorite) {
       track.categories = track.categories.filter(category => {
         return category != FAVORITES_CATEGORY;
       });
-      unfavoriteTrack(track.path);
+      categories[FAVORITES_CATEGORY] = categories[FAVORITES_CATEGORY].filter(favoritedTrack => {
+        return favoritedTrack != track;
+      });
+      currentCategories.set(categories);
+      unfavoriteTrack(track);
     } else {
       track.categories.push(FAVORITES_CATEGORY);
-      favoriteTrack(track.path);
+      categories[FAVORITES_CATEGORY].push(track);
+      currentCategories.set(categories);
+      favoriteTrack(track);
     }
 
     favorite = !favorite;

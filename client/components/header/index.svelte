@@ -5,16 +5,17 @@
     NAV_ITEM_CATEGORIES
   } from '../../constants';
   import { filterQuery, currentNavItem } from '../../store';
+  import { createEmptyQuery, createCategoryQuery } from '../../filtering';
 
   import NavItem from './nav-item';
   import FilterInput from './tracks-filter-input';
 
   function filterFavorites() {
-    filterQuery.set(FAVORITES_CATEGORY);
+    filterQuery.set(createCategoryQuery(FAVORITES_CATEGORY));
   }
 
   function filterReset() {
-    filterQuery.set('');
+    filterQuery.set(createEmptyQuery());
   }
 
   function showCategories() {

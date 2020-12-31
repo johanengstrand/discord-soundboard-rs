@@ -1,12 +1,13 @@
 <script>
   import { filterQuery } from '../../store';
+  import { createCategoryQuery } from '../../filtering';
 
   export let label;
   export let favorite;
 
   function onClick(e) {
     e.stopPropagation();
-    filterQuery.set(label);
+    filterQuery.set(createCategoryQuery(label));
   }
 </script>
 
