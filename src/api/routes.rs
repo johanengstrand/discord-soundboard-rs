@@ -1,21 +1,22 @@
-use crate::api;
 use crate::bot;
 use crate::CONFIG;
 
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+use tokio::sync::RwLock;
 use songbird::Songbird;
 use serenity::CacheAndHttp;
-use serenity::Client;
-use serenity::http::client::Http;
-use serenity::model::id::ChannelId;
 
-pub async fn join(ctx: Arc<CacheAndHttp>, manager: Arc<Songbird>)
+pub async fn join(ctx: Arc<CacheAndHttp>, manager: Arc<Songbird>, bot_state: Arc<RwLock<bot::State>>)
     -> Result<impl warp::Reply, warp::Rejection> {
-    match bot::guilds::get_current_voice_channel(ctx, CONFIG.user_id).await {
+    match bot::guilds::get_current_voice_channel(ctx).await {
         Ok(Some(data)) => {
             let (_, join_result) = manager.join(data.guild_id, data.channel_id).await;
             match join_result {
-                Ok(_) => success!("Joined channel!"),
+                Ok(_) => {
+                    let mut bot_state_lock = bot_state.write().await;
+                    bot_state_lock.connected_guild_id = Some(data.guild_id);
+                    return success!("Joined channel!")
+                },
                 Err(why) => failure!(format!("Could not join channel ({})", why)),
 
             }
@@ -23,8 +24,21 @@ pub async fn join(ctx: Arc<CacheAndHttp>, manager: Arc<Songbird>)
         Ok(None) => failure!(format!("You are not connected to a voice channel")),
         Err(why) => failure!(format!("Could not join channel: {}", why)),
     }
-
 }
+
+pub async fn leave(manager: Arc<Songbird>, bot_state: Arc<RwLock<bot::State>>)
+    -> Result<impl warp::Reply, warp::Rejection> {
+    match bot_state.read().await.connected_guild_id {
+        Some(guild_id) => {
+            match manager.leave(guild_id).await {
+                Ok(_) => success!("Left channel"),
+                Err(why) => failure!(format!("Could not leave channel ({})", why)),
+            }
+        },
+        None => failure!("The bot is not currently connected to a voice channel"),
+    }
+}
+
 pub async fn tracks() -> Result<impl warp::Reply, warp::Rejection> {
     let track_list = bot::tracks::get_tracks_in_dir(&CONFIG.folder);
 

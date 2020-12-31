@@ -2,12 +2,10 @@ use crate::CONFIG;
 use std::sync::Arc;
 use serenity::{
     CacheAndHttp,
-    Client,
+    http::GuildPagination,
     prelude::SerenityError,
-    http::{client::Http, GuildPagination},
     model::{
-        channel::{ChannelType, GuildChannel, Message},
-        guild::GuildInfo,
+        channel::ChannelType,
         id::GuildId,
     },
 };
@@ -18,7 +16,7 @@ pub struct CurrentUserChannel {
     pub channel_id: u64,
 }
 
-pub async fn get_current_voice_channel(ctx: Arc<CacheAndHttp>, user_id: u64)
+pub async fn get_current_voice_channel(ctx: Arc<CacheAndHttp>)
     -> Result<Option<CurrentUserChannel>, SerenityError> {
     let guilds = ctx.http.get_guilds(&GuildPagination::After(GuildId(0)), 100 as u64).await?;
 

@@ -1,35 +1,16 @@
 #![feature(proc_macro_hygiene, decl_macro)]
+
+extern crate warp;
 extern crate serde_json;
-#[macro_use] extern crate warp;
 #[macro_use] extern crate serde;
 #[macro_use] extern crate lazy_static;
 
-use std::{collections::HashMap, convert::TryInto, env, sync::Arc};
-use std::process;
 use warp::Filter;
-use songbird::{
-    input::{
-        self,
-        cached::{Compressed, Memory},
-        Input,
-    },
-    Bitrate,
-    Call,
-    Event,
-    EventContext,
-    EventHandler as VoiceEventHandler,
-    SerenityInit,
-    TrackEvent,
-    Songbird,
-};
-use serenity::{
-    async_trait,
-    client::{Client, Context, EventHandler},
-    http::{client::Http},
-    model::{channel::Message, gateway::Ready, misc::Mentionable},
-    prelude::{Mutex, TypeMapKey},
-    Result as SerenityResult,
-};
+use std::process;
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use songbird::Songbird;
+use serenity::client::Client;
 
 mod api;
 mod bot;
@@ -45,26 +26,6 @@ lazy_static! {
     };
 }
 
-struct Handler;
-
-#[async_trait]
-impl EventHandler for Handler {
-    async fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
-    }
-}
-
-struct SoundStore;
-
-enum CachedSound {
-    Compressed(Compressed),
-    Uncompressed(Memory),
-}
-
-impl TypeMapKey for SoundStore {
-    type Value = Arc<Mutex<HashMap<String, CachedSound>>>;
-}
-
 fn json_body() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Clone {
     warp::body::content_length_limit(1024 * 16).and(warp::body::json())
 }
@@ -77,25 +38,12 @@ async fn start() {
         .expect("Failed to create discord client");
 
     let ctx = client.cache_and_http.clone();
-
-    // {
-    //     let mut data = client.data.write().await;
-
-    //     // Loading the audio ahead of time.
-    //     let mut audio_map = HashMap::new();
-
-    //     // let ting_src = Memory::new(
-    //     //     input::ffmpeg("ting.wav").await.expect("File should be in root folder."),
-    //     // ).expect("These parameters are well-defined.");
-    //     // let _ = ting_src.raw.spawn_loader();
-    //     // audio_map.insert("ting".into(), CachedSound::Uncompressed(ting_src));
-
-    //     data.insert::<SoundStore>(Arc::new(Mutex::new(audio_map)));
-    // }
+    let bot_state = Arc::new(RwLock::new(bot::State { connected_guild_id: None }));
 
     tokio::spawn(async move {
         let ctx_filter = warp::any().map(move || ctx.clone());
         let songbird_filter = warp::any().map(move || songbird.clone());
+        let bot_state_filter = warp::any().map(move || bot_state.clone());
 
         let join = warp::get()
             .and(warp::path("api"))
@@ -103,7 +51,16 @@ async fn start() {
             .and(warp::path::end())
             .and(ctx_filter.clone())
             .and(songbird_filter.clone())
+            .and(bot_state_filter.clone())
             .and_then(api::routes::join);
+
+        let leave = warp::get()
+            .and(warp::path("api"))
+            .and(warp::path("leave"))
+            .and(warp::path::end())
+            .and(songbird_filter.clone())
+            .and(bot_state_filter.clone())
+            .and_then(api::routes::leave);
 
         let tracks = warp::get()
             .and(warp::path("api"))
@@ -140,7 +97,14 @@ async fn start() {
 
         let public = warp::fs::dir("public");
 
-        let routes = tracks.or(public).or(join).or(play).or(stop).or(favorite).or(unfavorite);
+        let routes = public
+            .or(join)
+            .or(leave)
+            .or(play)
+            .or(stop)
+            .or(tracks)
+            .or(favorite)
+            .or(unfavorite);
 
         warp::serve(routes)
             .run(([0, 0, 0, 0], 8000))
