@@ -22,8 +22,9 @@ git = "https://github.com/serenity-rs/songbird"
 branch = "current"
 
 [dependencies.serenity]
-default-features = false
-features = ["client", "voice", "rustls_backend"]
+version = "0.9.3"
+default_features = false
+features = ["client", "gateway", "cache", "http", "model", "voice", "rustls_backend"]
 git = "https://github.com/serenity-rs/serenity"
 branch = "current"
 

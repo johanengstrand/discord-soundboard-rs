@@ -4,6 +4,7 @@ use config::{Config, File, ConfigError};
 pub struct Settings {
     pub token: String,
     pub folder: String,
+    pub user_id: u64,
 }
 
 impl Settings {

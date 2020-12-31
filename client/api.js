@@ -3,7 +3,13 @@
 /// @returns Object the JSON data returned by the server
 async function sendRequest(endpoint, method, data = null) {
   const url = `/api/${endpoint}`;
-  const options = { method };
+  const options = {
+    method,
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8'
+    },
+  };
+
   if (data) {
     options['body'] = JSON.stringify(data);
   }

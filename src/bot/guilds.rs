@@ -1,4 +1,9 @@
+use crate::CONFIG;
+use std::sync::Arc;
 use serenity::{
+    CacheAndHttp,
+    Client,
+    prelude::SerenityError,
     http::{client::Http, GuildPagination},
     model::{
         channel::{ChannelType, GuildChannel, Message},
@@ -7,18 +12,35 @@ use serenity::{
     },
 };
 
-// pub async fn get_current_voice_channel(client: &Http, user_id: String) -> {
-//     let guilds = client.get_guilds(&GuildPagination::After(GuildId(0u64)), 100).await;
-// }
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct CurrentUserChannel {
+    pub guild_id: u64,
+    pub channel_id: u64,
+}
 
-// async fn get_all_guilds(client: &Http) -> Result<Vec<GuildInfo>> {
-//     let mut last_guild_id = Some(0u64);
-//     let mut guilds: Vec<GuildInfo> = vec![];
-//     while let Some(after) = last_guild_id {
-//         let mut batch = client
-//             .get_guilds(&GuildPagination::After(GuildId(after)), 100)
-//             .await?;
-//         guilds.append(&mut batch);
-//         last_guild_id = batch.last().map(|guild| *guild.id.as_u64());
-//     }
+pub async fn get_current_voice_channel(ctx: Arc<CacheAndHttp>, user_id: u64)
+    -> Result<Option<CurrentUserChannel>, SerenityError> {
+    let guilds = ctx.http.get_guilds(&GuildPagination::After(GuildId(0)), 100 as u64).await?;
 
+    for guild in guilds.iter() {
+        let channels = ctx.http.get_channels(*guild.id.as_u64()).await?;
+        for channel in channels.iter() {
+            match channel.kind {
+                ChannelType::Voice =>
+                {
+                    for member in channel.members(ctx.cache.clone()).await?.iter() {
+                        if member.user.id == CONFIG.user_id {
+                            return Ok(Some(CurrentUserChannel {
+                                guild_id: guild.id.as_u64().clone(),
+                                channel_id: channel.id.as_u64().clone(),
+                            }))
+                        }
+                    }
+                },
+                _ => continue,
+            }
+        }
+    }
+
+    Ok(None)
+}

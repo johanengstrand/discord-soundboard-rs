@@ -38,10 +38,10 @@
       track.categories = track.categories.filter(category => {
         return category != FAVORITES_CATEGORY;
       });
-      unfavoriteTrack(track);
+      unfavoriteTrack(track.path);
     } else {
       track.categories.push(FAVORITES_CATEGORY);
-      favoriteTrack(track);
+      favoriteTrack(track.path);
     }
 
     favorite = !favorite;
