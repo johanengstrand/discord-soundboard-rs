@@ -40,6 +40,20 @@ async function post(endpoint, data) {
   return sendRequest(endpoint, 'POST', data);
 }
 
+/// @brief Tries to join the current voice channel of the user
+/// @throws Error if the bot could not join
+/// @returns nothing
+export async function joinChannel() {
+  return await post('join');
+}
+
+/// @brief Leaves the current voice channel
+/// @throws Error if the bot could not leave
+/// @returns nothing
+export async function leaveChannel() {
+  return await post('leave');
+}
+
 /// @brief Fetches all available tracks from the server
 /// @throws Error if the tracks could not be fetched
 /// @returns Object containing the path of all available tracks

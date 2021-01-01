@@ -7,6 +7,7 @@
 
   import NavItem from './nav-item';
   import Categories from './categories';
+  import JoinButton from './join-button';
   import FilterInput from './tracks-filter-input';
 
   let showCategoriesMenu = false;
@@ -77,6 +78,7 @@
   <FilterInput />
   <nav>
     <NavItem label={NAV_ITEM_CATEGORIES} callbackActive={showCategories} callbackInactive={hideCategories} />
+    <JoinButton />
   </nav>
 </header>
 

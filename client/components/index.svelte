@@ -39,6 +39,12 @@
     --border-color: #4a678c;
     --accent-color: var(--border-color);
     --accent-text-color: #b6cbff;
+    --success-color: #0fff62;
+    --success-text-color: #032810;
+    --success-color-hover: #67ff9b;
+    --failure-color: #fd3838;
+    --failure-text-color: #1e0505;
+    --failure-color-hover: #ff6060;
     --hover-background: rgba(0, 0, 0, 0.1);
     --tag-color: var(--background);
     --tag-color-root: #00ffdb;
@@ -81,9 +87,30 @@
     font-size: var(--font-size-sm);
     padding: var(--spacing-sm) var(--spacing);
     border: none;
+    border-radius: var(--border-radius);
     position: relative;
     font-family: inherit;
     transition: background-color var(--transition-time);
+  }
+
+  :global(button.success) {
+    background-color: var(--success-color);
+    color: var(--success-text-color);
+  }
+
+  :global(button.failure) {
+    background-color: var(--failure-color);
+    color: var(--failure-text-color);
+  }
+
+  :global(button.success:hover) {
+    background-color: var(--success-color-hover);
+    color: var(--background);
+  }
+
+  :global(button.failure:hover) {
+    background-color: var(--failure-color-hover);
+    color: var(--failure-text-color);
   }
 
   :global(input) {
