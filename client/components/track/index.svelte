@@ -96,13 +96,20 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  }
+
+  .metadata {
+    width: 100%;
   }
 
   h4, p {
     margin: 0;
+  }
+
+  h4 {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .favorite-wrapper {

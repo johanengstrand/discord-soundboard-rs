@@ -32,7 +32,7 @@
     display: grid;
     flex-wrap: wrap;
     flex-direction: column;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     grid-auto-rows: 1fr;
     column-gap: var(--spacing);
     row-gap: var(--spacing);
@@ -42,8 +42,14 @@
   }
 
   .empty {
-    grid-area: 1 / 1 / span 1 / span 3;
+    grid-area: 1 / 1 / span 1 / span 4;
     text-align: center;
+  }
+
+  @media screen and (max-width: 1200px) {
+    div {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
   @media screen and (max-width: 900px) {

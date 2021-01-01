@@ -1,11 +1,6 @@
 <script>
-  import { createCategoryQuery } from '../../filtering';
-  import { ROOT_CATEGORY, FAVORITES_CATEGORY } from '../../constants';
-  import { filterQuery, currentCategories } from '../../store';
-
-  function applyCategoryFilter(category) {
-    filterQuery.set(createCategoryQuery(category));
-  }
+  import Category from '../track/category';
+  import { currentCategories } from '../../store';
 </script>
 
 <style>
@@ -18,29 +13,6 @@
     flex-wrap: wrap;
   }
 
-  button {
-    background-color: transparent;
-    transition: color var(--transition-time);
-  }
-
-  button:hover {
-    color: var(--accent-color);
-  }
-
-  .favorite {
-    color: var(--tag-color-favorite);
-  }
-
-  .root {
-    color: var(--tag-color-root);
-  }
-
-  @media screen and (max-width: 900px) {
-    section {
-      justify-content: flex-start;
-    }
-  }
-
   @media screen and (max-width: 400px) {
     button {
       flex-basis: 33%;
@@ -50,12 +22,6 @@
 
 <section>
   {#each Object.keys($currentCategories) as category, i (category)}
-    <button
-      on:click={() => applyCategoryFilter(category)}
-      class:favorite={category == FAVORITES_CATEGORY}
-      class:root={category == ROOT_CATEGORY}
-    >
-      {category}
-    </button>
+    <Category simple={true} label={category} />
   {/each}
 </section>

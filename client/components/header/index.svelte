@@ -42,6 +42,9 @@
     box-sizing: border-box;
     background-color: var(--background);
     color: var(--text-color);
+  }
+
+  header.separator {
     border-bottom: 1px solid var(--background-light);
   }
 
@@ -80,7 +83,7 @@
   }
 </style>
 
-<header>
+<header class:separator={!showCategoriesMenu}>
   <h3>Discord soundboard</h3>
   <FilterInput />
   <nav>
