@@ -107,6 +107,7 @@
 
   .content {
     width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -126,6 +127,7 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    max-width: calc(100% - 2.5 * var(--spacing));
   }
 
   .favorite-wrapper {

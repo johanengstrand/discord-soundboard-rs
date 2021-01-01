@@ -25,12 +25,12 @@
 
 <style>
   button {
-    padding: 0.15rem 0.4rem;
+    height: 100%;
+    padding: 0 0.4rem;
     background-color: var(--tag-color);
     color: var(--tag-text-color);
     border-radius: var(--border-radius);
     margin: 0;
-    margin-top: 0.3rem;
     font-size: 0.8rem;
     text-transform: uppercase;
     font-weight: bold;
@@ -38,6 +38,7 @@
   }
 
   button.simple {
+    height: auto;
     background-color: transparent;
     color: var(--text-color);
     margin-top: 0px;

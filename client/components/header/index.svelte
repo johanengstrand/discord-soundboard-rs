@@ -8,16 +8,6 @@
   import Categories from './categories';
   import JoinButton from './join-button';
   import FilterInput from './tracks-filter-input';
-
-  let showCategoriesMenu = false;
-
-  function showCategories() {
-    showCategoriesMenu = true;
-  }
-
-  function hideCategories() {
-    showCategoriesMenu = false;
-  }
 </script>
 
 <style>
@@ -31,10 +21,6 @@
     box-sizing: border-box;
     background-color: var(--background);
     color: var(--text-color);
-  }
-
-  header.separator {
-    border-bottom: 1px solid var(--background-light);
   }
 
   h3, nav {
@@ -72,7 +58,7 @@
   }
 </style>
 
-<header class:separator={!showCategoriesMenu}>
+<header>
   <h3>Discord soundboard</h3>
   <FilterInput />
   <nav>

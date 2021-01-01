@@ -7,6 +7,7 @@
   section {
     background-color: var(--background-dark);
     width: 100%;
+    padding: 0.1rem 0;
     display: inline-flex;
     justify-content: center;
     align-items: center;
