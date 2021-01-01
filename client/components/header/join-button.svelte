@@ -46,7 +46,7 @@
 <style>
   button {
     width: 4.5rem;
-    padding: 0;
+    height: var(--control-height);
     margin-left: var(--spacing-xsm);
     display: flex;
     flex-direction: row;

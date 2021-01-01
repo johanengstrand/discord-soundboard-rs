@@ -5,6 +5,7 @@
 
   export let label;
   export let simple;
+  export let fontSize;
 
   function onClick(e) {
     e.stopPropagation();
@@ -78,6 +79,7 @@
   class:favorite={label == FAVORITES_CATEGORY}
   class:root={label == '' || label == ROOT_CATEGORY}
   class:simple
+  style="font-size: {fontSize};"
   on:click={onClick}
 >
   {#if label == ''}

@@ -22,6 +22,6 @@
 
 <section>
   {#each Object.keys($currentCategories) as category, i (category)}
-    <Category simple={true} label={category} />
+    <Category simple={true} label={category} fontSize='0.9rem'/>
   {/each}
 </section>

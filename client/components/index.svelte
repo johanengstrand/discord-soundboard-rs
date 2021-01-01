@@ -53,6 +53,7 @@
     --tag-text-color: var(--accent-text-color);
     --tag-text-color-root: var(--background);
     --tag-text-color-favorite: var(--background);
+    --control-height: 2.5rem;
     --spacing: 1rem;
     --spacing-xsm: 0.3rem;
     --spacing-sm: 0.5rem;
@@ -115,6 +116,7 @@
   }
 
   :global(input) {
+    height: var(--control-height);
     background-color: var(--background-dark);
     border: 1px solid var(--background-light);
     color: var(--text-color);

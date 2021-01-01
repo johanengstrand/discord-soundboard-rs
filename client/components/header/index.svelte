@@ -5,7 +5,6 @@
   } from '../../constants';
   import { currentNavItem } from '../../store';
 
-  import NavItem from './nav-item';
   import Categories from './categories';
   import JoinButton from './join-button';
   import FilterInput from './tracks-filter-input';
@@ -77,11 +76,7 @@
   <h3>Discord soundboard</h3>
   <FilterInput />
   <nav>
-    <NavItem label={NAV_ITEM_CATEGORIES} callbackActive={showCategories} callbackInactive={hideCategories} />
     <JoinButton />
   </nav>
 </header>
-
-{#if showCategoriesMenu}
-  <Categories />
-{/if}
+<Categories />
