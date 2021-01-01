@@ -1,21 +1,45 @@
-<script>
+<script context="module">
   import { hasJoined } from '../../store';
-  import { joinChannel, leaveChannel } from '../../api';
+  import { isConnected, joinChannel, leaveChannel } from '../../api';
+
+  async function setIsConnected() {
+    try {
+      let connected = await isConnected();
+
+      if (connected) {
+        hasJoined.set(true);
+      }
+    } catch (e) {}
+  }
+
+  setIsConnected();
+</script>
+
+<script>
+  let loading = false;
 
   async function toggleJoin() {
+    // Only set loading after a small delay to prevent flickering
+    // for fast requests/errors
+    const timeout = setTimeout(() => {
+      loading = true;
+    }, 200);
+
     try {
       if ($hasJoined) {
         await leaveChannel();
       } else {
         await joinChannel();
       }
+
+      hasJoined.set(!$hasJoined);
     } catch (e) {
       // TODO: show error
       console.error(e);
-      return;
     }
 
-    hasJoined.set(!$hasJoined);
+    clearTimeout(timeout);
+    loading = false;
   }
 </script>
 
@@ -24,18 +48,43 @@
     width: 4.5rem;
     padding: 0;
     margin-left: var(--spacing-xsm);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     transition: none;
+  }
+
+  @keyframes loader {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  svg {
+    width: 1.5rem;
+    animation-name: loader;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
   }
 </style>
 
 <button
+  class:loading
   class:success={$hasJoined == false}
   class:failure={$hasJoined == true}
   on:click={toggleJoin}
 >
-  {#if $hasJoined}
-    Leave
+  {#if loading}
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+    </svg>
   {:else}
-    Join
+    {#if $hasJoined}
+      Leave
+    {:else}
+      Join
+    {/if}
   {/if}
 </button>

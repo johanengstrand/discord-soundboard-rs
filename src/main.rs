@@ -42,10 +42,7 @@ async fn start() {
     bot::playback::setup(&mut client).await;
 
     let ctx = client.cache_and_http.clone();
-    let bot_state = Arc::new(RwLock::new(bot::State {
-        connected_guild_id: None,
-        current_call: None,
-    }));
+    let bot_state = bot::State::new();
 
     tokio::spawn(async move {
         let ctx_filter = warp::any().map(move || ctx.clone());
@@ -116,6 +113,7 @@ async fn start() {
         let routes = public
             .or(join)
             .or(leave)
+            .or(connected)
             .or(play)
             .or(stop)
             .or(tracks)
