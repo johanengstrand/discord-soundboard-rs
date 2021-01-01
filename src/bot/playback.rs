@@ -1,7 +1,8 @@
 use std::{
     collections::HashMap,
     convert::TryInto,
-    sync::Arc
+    sync::Arc,
+    time::Duration,
 };
 
 use serenity::{
@@ -57,15 +58,19 @@ pub async fn setup(client: &mut Client) {
     data.insert::<SoundStore>(Arc::new(Mutex::new(audio_map)));
 }
 
-pub async fn play(call_lock: Arc<Mutex<Call>>, path: &String) -> Result<(), SerenityError> {
+pub async fn play(call_lock: Arc<Mutex<Call>>, path: &String) -> Result<u128, SerenityError> {
     let mut call = call_lock.lock().await;
-    let ting_src = Memory::new(
-        input::ffmpeg(path).await.expect("File should be in root folder."),
-    ).expect("These parameters are well-defined.");
+    let source = input::ffmpeg(path).await.expect("File should be in root folder.");
+    let duration = source.metadata.duration;
+    let ting_src = Memory::new(source).expect("These parameters are well-defined.");
     let _ = ting_src.raw.spawn_loader();
     let cached_track = CachedSound::Uncompressed(ting_src);
     // audio_map.insert("ting".into(), CachedSound::Uncompressed(ting_src));
     let song = call.play_source((&cached_track).into());
-    Ok(())
+
+    match duration {
+        None => Ok(0),
+        Some(duration) => Ok(duration.as_millis()),
+    }
 }
 

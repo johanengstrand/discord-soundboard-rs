@@ -63,7 +63,8 @@ pub async fn play(manager: Arc<Songbird>, bot_state: Arc<RwLock<bot::State>>, tr
     match &bot_state.write().await.current_call {
         Some(call_lock) => {
             match bot::playback::play(call_lock.clone(), &track).await {
-                Ok(_) => success!(format!("Played track {}", track)),
+                // serde_json does not support u128? Casting to u64 works
+                Ok(duration) => success!(duration as u64),
                 Err(why) => failure!(format!("Failed to play track: {}", why)),
             }
         },
