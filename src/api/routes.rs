@@ -41,6 +41,14 @@ pub async fn leave(manager: Arc<Songbird>, bot_state: Arc<RwLock<bot::State>>)
     }
 }
 
+pub async fn connected(bot_state: Arc<RwLock<bot::State>>)
+    -> Result<impl warp::Reply, warp::Rejection> {
+    match &bot_state.read().await.current_call {
+        Some(connected) => success!(true),
+        None => failure!(false),
+    }
+}
+
 pub async fn tracks() -> Result<impl warp::Reply, warp::Rejection> {
     let track_list = bot::tracks::get_tracks_in_dir(&CONFIG.folder);
 

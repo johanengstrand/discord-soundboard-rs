@@ -52,7 +52,7 @@ async fn start() {
         let songbird_filter = warp::any().map(move || songbird.clone());
         let bot_state_filter = warp::any().map(move || bot_state.clone());
 
-        let join = warp::get()
+        let join = warp::post()
             .and(warp::path("api"))
             .and(warp::path("join"))
             .and(warp::path::end())
@@ -61,13 +61,20 @@ async fn start() {
             .and(bot_state_filter.clone())
             .and_then(api::routes::join);
 
-        let leave = warp::get()
+        let leave = warp::post()
             .and(warp::path("api"))
             .and(warp::path("leave"))
             .and(warp::path::end())
             .and(songbird_filter.clone())
             .and(bot_state_filter.clone())
             .and_then(api::routes::leave);
+
+        let connected = warp::get()
+            .and(warp::path("api"))
+            .and(warp::path("connected"))
+            .and(warp::path::end())
+            .and(bot_state_filter.clone())
+            .and_then(api::routes::connected);
 
         let tracks = warp::get()
             .and(warp::path("api"))
