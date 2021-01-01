@@ -10,11 +10,12 @@ pub async fn join(ctx: Arc<CacheAndHttp>, manager: Arc<Songbird>, bot_state: Arc
     -> Result<impl warp::Reply, warp::Rejection> {
     match bot::guilds::get_current_voice_channel(ctx).await {
         Ok(Some(data)) => {
-            let (_, join_result) = manager.join(data.guild_id, data.channel_id).await;
+            let (call_handle, join_result) = manager.join(data.guild_id, data.channel_id).await;
             match join_result {
                 Ok(_) => {
                     let mut bot_state_lock = bot_state.write().await;
                     bot_state_lock.connected_guild_id = Some(data.guild_id);
+                    bot_state_lock.current_call = Some(call_handle);
                     return success!("Joined channel!")
                 },
                 Err(why) => failure!(format!("Could not join channel ({})", why)),
@@ -31,11 +32,20 @@ pub async fn leave(manager: Arc<Songbird>, bot_state: Arc<RwLock<bot::State>>)
     match bot_state.read().await.connected_guild_id {
         Some(guild_id) => {
             match manager.leave(guild_id).await {
+                // TODO: Reset bot state
                 Ok(_) => success!("Left channel"),
                 Err(why) => failure!(format!("Could not leave channel ({})", why)),
             }
         },
         None => failure!("The bot is not currently connected to a voice channel"),
+    }
+}
+
+pub async fn connected(bot_state: Arc<RwLock<bot::State>>)
+    -> Result<impl warp::Reply, warp::Rejection> {
+    match &bot_state.read().await.current_call {
+        Some(connected) => success!(true),
+        None => failure!(false),
     }
 }
 
@@ -48,15 +58,17 @@ pub async fn tracks() -> Result<impl warp::Reply, warp::Rejection> {
     }
 }
 
-pub async fn play(track: String) -> Result<impl warp::Reply, warp::Rejection> {
-    // let play_track = bot::playback::play(track);
-
-    success!(track)
-
-    // match play_track {
-    //     Ok(play) => success!(play),
-    //     Err(why) => failure!(format!("Failed to play track: {}", why)),
-    // }
+pub async fn play(manager: Arc<Songbird>, bot_state: Arc<RwLock<bot::State>>, track: String)
+    -> Result<impl warp::Reply, warp::Rejection> {
+    match &bot_state.write().await.current_call {
+        Some(call_lock) => {
+            match bot::playback::play(call_lock.clone(), &track).await {
+                Ok(_) => success!(format!("Played track {}", track)),
+                Err(why) => failure!(format!("Failed to play track: {}", why)),
+            }
+        },
+        None => failure!("The bot is not currently connected to a voice channel"),
+    }
 }
 
 pub async fn stop() -> Result<impl warp::Reply, warp::Rejection> {
