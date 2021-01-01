@@ -16,6 +16,6 @@
 
 <section class="categories">
   {#each categories as category, i (category)}
-    <TrackCategory label={category} favorite={category == FAVORITES_CATEGORY} />
+    <TrackCategory label={category} />
   {/each}
 </section>

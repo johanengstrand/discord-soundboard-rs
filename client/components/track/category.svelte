@@ -1,13 +1,19 @@
 <script>
   import { filterQuery } from '../../store';
-  import { createCategoryQuery } from '../../filtering';
+  import { ROOT_CATEGORY, FAVORITES_CATEGORY } from '../../constants';
+  import { createEmptyQuery, createCategoryQuery } from '../../filtering';
 
   export let label;
-  export let favorite;
+  export let simple;
 
   function onClick(e) {
     e.stopPropagation();
-    filterQuery.set(createCategoryQuery(label));
+
+    if ($filterQuery.query == label) {
+      filterQuery.set(createEmptyQuery());
+    } else {
+      filterQuery.set(createCategoryQuery(label));
+    }
   }
 </script>
 
@@ -25,20 +31,52 @@
     transition: background-color color var(--transition-time);
   }
 
+  button.simple {
+    background-color: transparent;
+    color: var(--text-color);
+    margin-top: 0px;
+    padding: var(--spacing-sm) var(--spacing-sm);
+  }
+
   button:hover {
     background-color: var(--tag-text-color);
     color: var(--tag-color);
+  }
+
+  button.simple:hover {
+    background-color: transparent;
+    color: var(--accent-color);
   }
 
   .favorite {
     background-color: var(--tag-color-favorite);
     color: var(--tag-text-color-favorite);
   }
+
+  .root {
+    background-color: var(--tag-color-root);
+    color: var(--tag-text-color-root);
+  }
+
+  .favorite.simple {
+    background-color: transparent;
+    color: var(--tag-color-favorite);
+  }
+
+  .root.simple {
+    background-color: transparent;
+    color: var(--tag-color-root);
+  }
 </style>
 
-<button class:favorite on:click={onClick}>
-  {#if favorite}
-    favorite
+<button
+  class:favorite={label == FAVORITES_CATEGORY}
+  class:root={label == '' || label == ROOT_CATEGORY}
+  class:simple
+  on:click={onClick}
+>
+  {#if label == ''}
+    {ROOT_CATEGORY}
   {:else}
     {label}
   {/if}

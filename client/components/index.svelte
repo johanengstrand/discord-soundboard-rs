@@ -4,16 +4,20 @@
 
   import { fetchTracks } from '../api';
   import { currentCategories } from '../store';
+  import { ROOT_CATEGORY } from '../constants';
 
   async function fetchAndParseTracks() {
     const tracks = await fetchTracks();
     const parsedCategories = {
+      [ROOT_CATEGORY]: [], // create a category for the tracks stored in the root folder (category='')
       favorite: [], // always create a favorites category even if empty
     };
 
     for (const track of tracks) {
       for (const category of track.categories) {
-        if (parsedCategories.hasOwnProperty(category)) {
+        if (category == '') {
+          parsedCategories[ROOT_CATEGORY].push(track);
+        } else if (parsedCategories.hasOwnProperty(category)) {
           parsedCategories[category].push(track);
         } else {
           parsedCategories[category] = [track];
@@ -37,8 +41,10 @@
     --accent-text-color: #b6cbff;
     --hover-background: rgba(0, 0, 0, 0.1);
     --tag-color: var(--background);
-    --tag-color-favorite: #ea9a00;
+    --tag-color-root: #00ffdb;
+    --tag-color-favorite: #ffb629;
     --tag-text-color: var(--accent-text-color);
+    --tag-text-color-root: var(--background);
     --tag-text-color-favorite: var(--background);
     --spacing: 1rem;
     --spacing-xsm: 0.3rem;
@@ -101,6 +107,11 @@
     margin-top: var(--spacing)
   }
 
+  .status {
+    width: 100%;
+    text-align: center;
+  }
+
   @media screen and (max-width: 400px) {
     main {
       padding-bottom: var(--spacing-sm);
@@ -112,10 +123,10 @@
 <Header />
 <main>
   {#await fetchAndParseTracks()}
-    <p>Fetching tracks..</p>
+    <p class="status">Fetching tracks...</p>
   {:then tracks}
     <Tracks tracks={tracks} />
   {:catch error}
-    <p>{error.message}</p>
+    <p class="status">{error.message}</p>
   {/await}
 </main>
