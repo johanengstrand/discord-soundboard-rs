@@ -6,8 +6,10 @@ extern crate serde_json;
 #[macro_use] extern crate lazy_static;
 
 use warp::Filter;
-use std::process;
-use std::sync::Arc;
+use std::{
+    process,
+    sync::Arc,
+};
 use tokio::sync::RwLock;
 use songbird::Songbird;
 use serenity::client::Client;
@@ -37,8 +39,13 @@ async fn start() {
         .await
         .expect("Failed to create discord client");
 
+    bot::playback::setup(&mut client).await;
+
     let ctx = client.cache_and_http.clone();
-    let bot_state = Arc::new(RwLock::new(bot::State { connected_guild_id: None }));
+    let bot_state = Arc::new(RwLock::new(bot::State {
+        connected_guild_id: None,
+        current_call: None,
+    }));
 
     tokio::spawn(async move {
         let ctx_filter = warp::any().map(move || ctx.clone());
@@ -72,6 +79,8 @@ async fn start() {
             .and(warp::path("api"))
             .and(warp::path("play"))
             .and(warp::path::end())
+            .and(songbird_filter.clone())
+            .and(bot_state_filter.clone())
             .and(json_body())
             .and_then(api::routes::play);
 
