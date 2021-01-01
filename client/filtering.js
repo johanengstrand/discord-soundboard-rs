@@ -22,7 +22,7 @@ export function createCustomQuery(query) {
 }
 
 export function categoryFiltering(tracks, category, categories) {
-  if (!categories || !categories.hasOwnProperty(category)) {
+  if (!categories || !categories.hasOwnProperty(category.toLowerCase())) {
     return tracks;
   }
 
@@ -39,13 +39,13 @@ export function customFiltering(tracks, currentTracks, query, previousQuery) {
   let filteredTracks = tracksToFilter.filter(track => {
     const { name, categories } = track;
 
-    if (name.length >= query.length && name.includes(query)) {
+    if (name.length >= query.length && name.includes(query.toLowerCase())) {
       return true;
     }
 
     // Check if any of the tracks categories match the query
     for (const category of categories) {
-      if (category.length >= query.length && category.includes(query)) {
+      if (category.length >= query.length && category.includes(query.toLowerCase())) {
         return true;
       }
     }
