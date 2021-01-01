@@ -40,6 +40,13 @@ async function post(endpoint, data) {
   return sendRequest(endpoint, 'POST', data);
 }
 
+/// @brief Gets the current connection status of the bot
+/// @throws Error if the status could not be retrieved
+/// @returns true if the bot is connected to a voice channel
+export async function isConnected() {
+  return await get('connected');
+}
+
 /// @brief Tries to join the current voice channel of the user
 /// @throws Error if the bot could not join
 /// @returns nothing
