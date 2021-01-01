@@ -1,9 +1,9 @@
 <script>
   import { filterQuery } from '../../store';
   import { createCategoryQuery } from '../../filtering';
+  import { ROOT_CATEGORY, FAVORITES_CATEGORY } from '../../constants';
 
   export let label;
-  export let favorite;
 
   function onClick(e) {
     e.stopPropagation();
@@ -34,11 +34,20 @@
     background-color: var(--tag-color-favorite);
     color: var(--tag-text-color-favorite);
   }
+
+  .root {
+    background-color: var(--tag-color-root);
+    color: var(--tag-text-color-root);
+  }
 </style>
 
-<button class:favorite on:click={onClick}>
-  {#if favorite}
-    favorite
+<button
+  class:favorite={label == FAVORITES_CATEGORY}
+  class:root={label == ''}
+  on:click={onClick}
+>
+  {#if label == ''}
+    {ROOT_CATEGORY}
   {:else}
     {label}
   {/if}

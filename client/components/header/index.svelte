@@ -8,9 +8,13 @@
   import { createEmptyQuery, createCategoryQuery } from '../../filtering';
 
   import NavItem from './nav-item';
+  import Categories from './categories';
   import FilterInput from './tracks-filter-input';
 
+  let showCategoriesMenu = false;
+
   function filterFavorites() {
+    hideCategories();
     filterQuery.set(createCategoryQuery(FAVORITES_CATEGORY));
   }
 
@@ -19,11 +23,11 @@
   }
 
   function showCategories() {
-    console.log('show categories');
+    showCategoriesMenu = true;
   }
 
   function hideCategories() {
-    console.log('hide categories');
+    showCategoriesMenu = false;
   }
 </script>
 
@@ -84,3 +88,7 @@
     <NavItem label={NAV_ITEM_CATEGORIES} callbackActive={showCategories} callbackInactive={hideCategories} />
   </nav>
 </header>
+
+{#if showCategoriesMenu}
+  <Categories />
+{/if}

@@ -41,6 +41,11 @@
     box-sizing: border-box;
   }
 
+  .empty {
+    grid-area: 1 / 1 / span 1 / span 3;
+    text-align: center;
+  }
+
   @media screen and (max-width: 900px) {
     div {
       grid-template-columns: repeat(2, 1fr);
@@ -64,5 +69,7 @@
 <div>
   {#each filteredTracks as track, i (track.path)}
     <Track {track} />
+  {:else}
+    <p class="empty">No tracks found</p>
   {/each}
 </div>
