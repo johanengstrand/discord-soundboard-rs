@@ -9,10 +9,15 @@
   function onClick(e) {
     e.stopPropagation();
 
-    if ($filterQuery.query == label) {
+    let newQuery = label;
+    if (newQuery == '') {
+      newQuery = ROOT_CATEGORY;
+    }
+
+    if ($filterQuery.query == newQuery) {
       filterQuery.set(createEmptyQuery());
     } else {
-      filterQuery.set(createCategoryQuery(label));
+      filterQuery.set(createCategoryQuery(newQuery));
     }
   }
 </script>

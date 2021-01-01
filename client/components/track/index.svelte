@@ -5,15 +5,18 @@
     favoriteTrack,
     unfavoriteTrack,
   } from '../../api';
-  import { currentTrack, currentCategories } from '../../store';
+  import { currentTrack, currentCategories, hasJoined } from '../../store';
   import { FAVORITES_CATEGORY } from '../../constants';
+
+  import ProgressBar from './progress-bar';
   import TrackCategories from './categories';
 
   let favorite = false;
   let active = false;
+  let duration = 0;
   export let track;
 
-  function attemptPlayback() {
+  async function attemptPlayback() {
     if (!track || !track?.name) {
       return;
     }
@@ -23,8 +26,10 @@
       stopTrack();
       currentTrack.set(null);
     } else {
-      playTrack(track.path);
-      currentTrack.set(track.name);
+      try {
+        duration = await playTrack(track.path);
+        currentTrack.set(track.name);
+      } catch (e) {}
     }
 
     active = true;
@@ -57,8 +62,19 @@
     track = track;
   }
 
+  function onTrackFinished() {
+    currentTrack.set(null);
+    duration = 0;
+  }
+
   currentTrack.subscribe(name => {
     active = name == track.name;
+  });
+
+  hasJoined.subscribe(connected => {
+    if (!connected) {
+      duration = 0;
+    }
   });
 
   active = $currentTrack == track.name;
@@ -73,12 +89,14 @@
     background-color: var(--background-light);
     color: var(--text-color);
     padding: var(--spacing-sm) var(--spacing-md);
+    padding-right: 0;
     margin: 0;
     border: 1px solid transparent;
     border-radius: var(--border-radius);
     min-width: 33%;
     cursor: pointer;
     position: relative;
+    overflow: hidden;
     box-shadow: 2px 2px 10px #0c0f13;
     transition: background-color var(--transition-time);
   }
@@ -87,15 +105,13 @@
     border-color: var(--border-color);
   }
 
-  .active {
-    background-color: var(--border-color);
-  }
-
   .content {
-    max-width: calc(100% - 2.5 * var(--spacing));
+    width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
+    position: relative;
+    z-index: 2;
   }
 
   .metadata {
@@ -139,7 +155,10 @@
   }
 </style>
 
-<article on:click={attemptPlayback} class:active={$currentTrack == track.name}>
+<article on:click={attemptPlayback}>
+  {#if duration != 0}
+    <ProgressBar {duration} finishedCallback={onTrackFinished} />
+  {/if}
   <div class="content">
     <section class="metadata">
       <h4>{trackName}</h4>

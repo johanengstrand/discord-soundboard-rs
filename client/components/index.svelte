@@ -45,6 +45,7 @@
     --failure-color: #fd3838;
     --failure-text-color: #1e0505;
     --failure-color-hover: #ff6060;
+    --progress-bar-color: var(--accent-color);
     --hover-background: rgba(0, 0, 0, 0.1);
     --tag-color: var(--background);
     --tag-color-root: #00ffdb;
