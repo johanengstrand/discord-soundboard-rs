@@ -15,7 +15,7 @@ pub async fn join(ctx: Arc<CacheAndHttp>, manager: Arc<Songbird>, bot_state: Arc
                 Ok(_) => {
                     let mut bot_state_lock = bot_state.write().await;
                     bot_state_lock.connected_guild_id = Some(data.guild_id);
-                    bot_state_lock.current_call = Some(call_handle);
+                    bot_state_lock.current_call = Some(call_handle.clone());
                     return success!("Joined channel!")
                 },
                 Err(why) => failure!(format!("Could not join channel ({})", why)),
@@ -32,8 +32,12 @@ pub async fn leave(manager: Arc<Songbird>, bot_state: Arc<RwLock<bot::State>>)
     match bot_state.read().await.connected_guild_id {
         Some(guild_id) => {
             match manager.leave(guild_id).await {
-                // TODO: Reset bot state
-                Ok(_) => success!("Left channel"),
+                Ok(_) => {
+                    // let mut bot_state_lock = bot_state.write().await;
+                    // bot_state_lock.connected_guild_id = None;
+                    // bot_state_lock.current_call = None;
+                    success!("Left channel")
+                },
                 Err(why) => failure!(format!("Could not leave channel ({})", why)),
             }
         },
@@ -43,9 +47,9 @@ pub async fn leave(manager: Arc<Songbird>, bot_state: Arc<RwLock<bot::State>>)
 
 pub async fn connected(bot_state: Arc<RwLock<bot::State>>)
     -> Result<impl warp::Reply, warp::Rejection> {
-    match &bot_state.read().await.current_call {
-        Some(connected) => success!(true),
-        None => failure!(false),
+    match bot_state.read().await.current_call {
+        Some(_) => success!(true),
+        None => success!(false),
     }
 }
 

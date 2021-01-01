@@ -1,7 +1,21 @@
-<script>
+<script context="module">
   import { hasJoined } from '../../store';
   import { isConnected, joinChannel, leaveChannel } from '../../api';
 
+  async function setIsConnected() {
+    try {
+      let connected = await isConnected();
+
+      if (connected) {
+        hasJoined.set(true);
+      }
+    } catch (e) {}
+  }
+
+  setIsConnected();
+</script>
+
+<script>
   let loading = false;
 
   async function toggleJoin() {
@@ -12,12 +26,6 @@
     }, 200);
 
     try {
-      let connected = await isConnected();
-
-      if (connected != $hasJoined) {
-        hasJoined.set(connected);
-      }
-
       if ($hasJoined) {
         await leaveChannel();
       } else {

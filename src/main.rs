@@ -116,6 +116,7 @@ async fn start() {
         let routes = public
             .or(join)
             .or(leave)
+            .or(connected)
             .or(play)
             .or(stop)
             .or(tracks)
