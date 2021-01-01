@@ -1,6 +1,5 @@
 <script>
   import debounce from '../../debounce';
-  import { NAV_ITEM_FAVORITES } from '../../constants';
   import { createEmptyQuery, createCustomQuery } from '../../filtering';
   import { filterQuery, currentNavItem } from '../../store';
 
@@ -12,11 +11,6 @@
 
   function resetFilterQuery() {
     filterQuery.set(createEmptyQuery());
-
-    // Reset the currently selected nav item if the favorites item is chosen
-    if ($currentNavItem == NAV_ITEM_FAVORITES) {
-      currentNavItem.set('');
-    }
   }
 
   filterQuery.subscribe(queryData => {

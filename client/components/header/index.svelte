@@ -1,26 +1,15 @@
 <script>
   import {
     FAVORITES_CATEGORY,
-    NAV_ITEM_FAVORITES,
     NAV_ITEM_CATEGORIES
   } from '../../constants';
-  import { filterQuery, currentNavItem } from '../../store';
-  import { createEmptyQuery, createCategoryQuery } from '../../filtering';
+  import { currentNavItem } from '../../store';
 
   import NavItem from './nav-item';
   import Categories from './categories';
   import FilterInput from './tracks-filter-input';
 
   let showCategoriesMenu = false;
-
-  function filterFavorites() {
-    hideCategories();
-    filterQuery.set(createCategoryQuery(FAVORITES_CATEGORY));
-  }
-
-  function filterReset() {
-    filterQuery.set(createEmptyQuery());
-  }
 
   function showCategories() {
     showCategoriesMenu = true;
@@ -87,7 +76,6 @@
   <h3>Discord soundboard</h3>
   <FilterInput />
   <nav>
-    <NavItem label={NAV_ITEM_FAVORITES} callbackActive={filterFavorites} callbackInactive={filterReset} />
     <NavItem label={NAV_ITEM_CATEGORIES} callbackActive={showCategories} callbackInactive={hideCategories} />
   </nav>
 </header>
