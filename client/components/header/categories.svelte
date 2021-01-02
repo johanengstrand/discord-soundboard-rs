@@ -12,6 +12,7 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    border-bottom: 1px solid var(--background-light);
   }
 
   @media screen and (max-width: 400px) {

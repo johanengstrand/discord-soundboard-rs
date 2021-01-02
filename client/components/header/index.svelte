@@ -21,6 +21,7 @@
     box-sizing: border-box;
     background-color: var(--background);
     color: var(--text-color);
+    border-bottom: 1px solid var(--background-light);
   }
 
   h3, nav {
