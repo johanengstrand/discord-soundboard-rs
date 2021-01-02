@@ -1,5 +1,6 @@
 <script context="module">
   import { hasJoined } from '../../store';
+  import { createNotification } from '../../notifications';
   import { isConnected, joinChannel, leaveChannel } from '../../api';
 
   async function setIsConnected() {
@@ -9,7 +10,9 @@
       if (connected) {
         hasJoined.set(true);
       }
-    } catch (e) {}
+    } catch (e) {
+      createNotification(e, true);
+    }
   }
 
   setIsConnected();
@@ -34,8 +37,7 @@
 
       hasJoined.set(!$hasJoined);
     } catch (e) {
-      // TODO: show error
-      console.error(e);
+      createNotification(e, true);
     }
 
     clearTimeout(timeout);
@@ -71,8 +73,7 @@
 
 <button
   class:loading
-  class:success={$hasJoined == false}
-  class:failure={$hasJoined == true}
+  class:cta={$hasJoined == false}
   on:click={toggleJoin}
 >
   {#if loading}

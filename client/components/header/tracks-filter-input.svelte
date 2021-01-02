@@ -1,7 +1,7 @@
 <script>
   import debounce from '../../debounce';
   import { createEmptyQuery, createCustomQuery } from '../../filtering';
-  import { filterQuery, currentNavItem } from '../../store';
+  import { filterQuery, currentNavItem, currentCategories } from '../../store';
 
   let active = false;
 
