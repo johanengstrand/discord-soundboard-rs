@@ -39,19 +39,27 @@ export function customFiltering(tracks, currentTracks, query, previousQuery) {
   let filteredTracks = tracksToFilter.filter(track => {
     const { name, categories } = track;
 
-    if (name.length >= query.length && name.includes(query.toLowerCase())) {
+    if (
+      name.length >= query.length &&
+      name.toLowerCase().includes(query.toLowerCase())
+    ) {
       return true;
     }
 
     // Check if any of the tracks categories match the query
     for (const category of categories) {
-      if (category.length >= query.length && category.includes(query.toLowerCase())) {
+      if (
+        category.length >= query.length &&
+        category.toLowerCase().includes(query.toLowerCase())
+      ) {
         return true;
       }
     }
 
     return false;
   });
+
+  console.log(filteredTracks);
 
   return filteredTracks;
 }
