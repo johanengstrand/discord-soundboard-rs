@@ -4,7 +4,7 @@
   import { createEmptyQuery, createCategoryQuery } from '../../filtering';
 
   export let label;
-  export let simple;
+  export let list;
   export let fontSize;
 
   function onClick(e) {
@@ -37,12 +37,16 @@
     transition: background-color color var(--transition-time);
   }
 
-  button.simple {
+  button.list {
     height: auto;
     background-color: transparent;
     color: var(--text-color);
     margin-top: 0px;
-    padding: var(--spacing-sm) var(--spacing-sm);
+    padding: var(--spacing-xsm) var(--spacing-sm);
+  }
+
+  button.list.active {
+    background-color: var(--background-light);
   }
 
   button:hover {
@@ -50,36 +54,62 @@
     color: var(--tag-color);
   }
 
-  button.simple:hover {
-    background-color: transparent;
-    color: var(--accent-color);
+  button.list:hover {
+    background-color: var(--background-light);
+    color: var(--text-color);
   }
 
-  .favorite {
+  button.favorite {
     background-color: var(--tag-color-favorite);
     color: var(--tag-text-color-favorite);
   }
 
-  .root {
+  button.root {
     background-color: var(--tag-color-root);
     color: var(--tag-text-color-root);
   }
 
-  .favorite.simple {
+  button.list.favorite {
     background-color: transparent;
     color: var(--tag-color-favorite);
   }
 
-  .root.simple {
+  button.list.root {
     background-color: transparent;
     color: var(--tag-color-root);
+  }
+
+  button.list.root {
+    background-color: transparent;
+    color: var(--tag-color-root);
+  }
+
+  button.list.favorite:hover {
+    color: var(--tag-text-color-favorite);
+    background-color: var(--tag-color-favorite);
+  }
+
+  button.list.root:hover {
+    color: var(--tag-text-color-root);
+    background-color: var(--tag-color-root);
+  }
+
+  button.list.favorite.active {
+    color: var(--tag-text-color-favorite);
+    background-color: var(--tag-color-favorite);
+  }
+
+  button.list.root.active {
+    color: var(--tag-text-color-root);
+    background-color: var(--tag-color-root);
   }
 </style>
 
 <button
+  class:active={$filterQuery.query == label}
   class:favorite={label == FAVORITES_CATEGORY}
   class:root={label == '' || label == ROOT_CATEGORY}
-  class:simple
+  class:list
   style="font-size: {fontSize};"
   on:click={onClick}
 >

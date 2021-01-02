@@ -10,8 +10,8 @@
   async function fetchAndParseTracks() {
     const tracks = await fetchTracks();
     const parsedCategories = {
-      [ROOT_CATEGORY]: [], // create a category for the tracks stored in the root folder (category='')
       favorite: [], // always create a favorites category even if empty
+      [ROOT_CATEGORY]: [], // create a category for the tracks stored in the root folder (category='')
     };
 
     for (const track of tracks) {
