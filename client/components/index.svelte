@@ -1,6 +1,7 @@
 <script>
   import Header from './header';
   import Tracks from './tracks';
+  import Notifications from './notifications';
 
   import { fetchTracks } from '../api';
   import { currentCategories } from '../store';
@@ -41,10 +42,8 @@
     --accent-text-color: #b6cbff;
     --success-color: #0fff62;
     --success-text-color: #032810;
-    --success-color-hover: #67ff9b;
     --failure-color: #fd3838;
-    --failure-text-color: #1e0505;
-    --failure-color-hover: #ff6060;
+    --failure-text-color: white;
     --progress-bar-color: var(--accent-color);
     --hover-background: rgba(0, 0, 0, 0.1);
     --tag-color: var(--background);
@@ -95,9 +94,9 @@
     transition: background-color var(--transition-time);
   }
 
-  :global(button.success) {
-    background-color: var(--success-color);
-    color: var(--success-text-color);
+  :global(button.cta) {
+    background-color: var(--accent-text-color);
+    color: var(--background-dark);
   }
 
   :global(button.failure) {
@@ -105,14 +104,12 @@
     color: var(--failure-text-color);
   }
 
-  :global(button.success:hover) {
-    background-color: var(--success-color-hover);
-    color: var(--background);
+  :global(button.cta:hover) {
+    filter: brightness(90%);
   }
 
   :global(button.failure:hover) {
-    background-color: var(--failure-color-hover);
-    color: var(--failure-text-color);
+    filter: brightness(110%);
   }
 
   :global(input) {
@@ -160,3 +157,4 @@
     <p class="status">{error.message}</p>
   {/await}
 </main>
+<Notifications />

@@ -5,8 +5,9 @@
     favoriteTrack,
     unfavoriteTrack,
   } from '../../api';
-  import { currentCategories, hasJoined } from '../../store';
   import { FAVORITES_CATEGORY } from '../../constants';
+  import { createNotification } from '../../notifications';
+  import { currentCategories, hasJoined } from '../../store';
 
   import ProgressBar from './progress-bar';
   import TrackCategories from './categories';
@@ -28,31 +29,37 @@
     } else {
       try {
         duration = await playTrack(track.path);
-      } catch (e) {}
+      } catch (e) {
+        createNotification(e, true);
+      }
     }
 
     active = true;
   }
 
-  function toggleFavorite(e) {
+  async function toggleFavorite(e) {
     // Prevent event propagation to 'attemptPlayback'
     e.stopPropagation();
     const categories = $currentCategories;
 
-    if (favorite) {
-      track.categories = track.categories.filter(category => {
-        return category != FAVORITES_CATEGORY;
-      });
-      categories[FAVORITES_CATEGORY] = categories[FAVORITES_CATEGORY].filter(favoritedTrack => {
-        return favoritedTrack != track;
-      });
-      currentCategories.set(categories);
-      unfavoriteTrack(track);
-    } else {
-      track.categories.push(FAVORITES_CATEGORY);
-      categories[FAVORITES_CATEGORY].push(track);
-      currentCategories.set(categories);
-      favoriteTrack(track);
+    try {
+      if (favorite) {
+        track.categories = track.categories.filter(category => {
+          return category != FAVORITES_CATEGORY;
+        });
+        categories[FAVORITES_CATEGORY] = categories[FAVORITES_CATEGORY].filter(favoritedTrack => {
+          return favoritedTrack != track;
+        });
+        currentCategories.set(categories);
+        await unfavoriteTrack(track);
+      } else {
+        track.categories.push(FAVORITES_CATEGORY);
+        categories[FAVORITES_CATEGORY].push(track);
+        currentCategories.set(categories);
+        await favoriteTrack(track);
+      }
+    } catch (e) {
+      createNotification(e, true);
     }
 
     favorite = !favorite;
