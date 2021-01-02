@@ -36,6 +36,7 @@ pub async fn leave(manager: Arc<Songbird>, bot_state: Arc<Mutex<bot::State>>)
                 Ok(_) => {
                     bot_state_lock.current_guild_id = None;
                     bot_state_lock.current_call = None;
+                    bot::playback::stop_all(&mut bot_state_lock.cached_tracks).await;
                     success!("Left channel")
                 },
                 Err(why) => failure!(format!("Could not leave channel ({})", why)),

@@ -146,3 +146,10 @@ pub async fn stop(cached_tracks: &mut HashMap<String, CachedTrack>, path: &Strin
         Some(cached_track) => cached_track.stop().await,
     }
 }
+
+/// Stops the playback of all currently playing tracks.
+pub async fn stop_all(cached_tracks: &mut HashMap<String, CachedTrack>) {
+    for (_, cached_track) in cached_tracks.iter_mut() {
+        let _ = cached_track.stop().await;
+    }
+}
