@@ -22,7 +22,9 @@ export function createCustomQuery(query) {
 }
 
 export function categoryFiltering(tracks, category, categories) {
-  if (!categories || !categories.hasOwnProperty(category.toLowerCase())) {
+  // No need to consider casing here, since 'category' is always set
+  // programatically and will match an existing category exactly
+  if (!categories || !categories.hasOwnProperty(category)) {
     return tracks;
   }
 
