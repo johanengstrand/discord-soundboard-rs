@@ -35,8 +35,6 @@ async fn start() {
         .await
         .expect("Failed to create discord client");
 
-    bot::playback::setup(&mut client).await;
-
     let ctx = client.cache_and_http.clone();
     let bot_state = bot::State::new();
 

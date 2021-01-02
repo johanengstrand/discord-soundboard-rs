@@ -76,7 +76,7 @@ pub async fn play(bot_state: Arc<Mutex<bot::State>>, path: String)
 pub async fn stop(bot_state: Arc<Mutex<bot::State>>, path: String) -> Result<impl warp::Reply, warp::Rejection> {
     let mut bot_state_lock = bot_state.lock().await;
 
-    match bot::playback::stop(&mut bot_state_lock.current_tracks, &path).await {
+    match bot::playback::stop(&mut bot_state_lock.cached_tracks, &path).await {
         Ok(_) => success!(format!("Stopped track: {}", path)),
         Err(why) => failure!(format!("Failed to stop track: {}", why)),
     }
