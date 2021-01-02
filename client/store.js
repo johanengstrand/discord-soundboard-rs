@@ -6,3 +6,5 @@ export const currentNavItem = writable('');
 export const currentCategories = writable({});
 export const currentNotification = writable(null);
 export const hasJoined = writable(false);
+export const filteredTracks = writable([]);
+export const allTracks = writable([]);

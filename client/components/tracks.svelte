@@ -1,30 +1,10 @@
 <script>
   import Track from './track';
   import { QUERY_TYPE } from '../constants';
-  import { filterQuery, currentCategories } from '../store';
   import { customFiltering, categoryFiltering } from '../filtering';
+  import { currentCategories } from '../store';
 
-  let previousQuery;
-  let filteredTracks;
   export let tracks;
-
-  function filterTracks(queryData) {
-    if (!queryData || queryData.type == QUERY_TYPE.EMPTY) {
-      filteredTracks = tracks;
-      return;
-    }
-
-    const { type, query } = queryData;
-    if (type == QUERY_TYPE.CATEGORY) {
-      filteredTracks = categoryFiltering(tracks, query, $currentCategories);
-    } else {
-      filteredTracks = customFiltering(tracks, filteredTracks, query, previousQuery);
-    }
-
-    previousQuery = query;
-  }
-
-  filterQuery.subscribe(filterTracks);
 </script>
 
 <style>
@@ -73,7 +53,7 @@
 </style>
 
 <div>
-  {#each filteredTracks as track, i (track.path)}
+  {#each tracks as track, i (track.path)}
     <Track {track} />
   {:else}
     <p class="empty">No tracks found</p>

@@ -7,11 +7,12 @@
   } from '../../api';
   import { FAVORITES_CATEGORY } from '../../constants';
   import { createNotification } from '../../notifications';
-  import { currentCategories, hasJoined } from '../../store';
+  import { filteredTracks, currentCategories, hasJoined } from '../../store';
 
   import ProgressBar from './progress-bar';
   import TrackCategories from './categories';
 
+  let hidden = false;
   let favorite = false;
   let active = false;
   let duration = 0;
@@ -78,6 +79,10 @@
     }
   });
 
+  filteredTracks.subscribe(tracks => {
+    hidden = !tracks.includes(track);
+  });
+
   active = duration != 0;
   favorite = track.categories.includes(FAVORITES_CATEGORY);
 
@@ -100,6 +105,10 @@
     overflow: hidden;
     box-shadow: 2px 2px 10px #0c0f13;
     transition: background-color var(--transition-time);
+  }
+
+  article.hidden {
+    display: none;
   }
 
   article:hover {
@@ -158,7 +167,7 @@
   }
 </style>
 
-<article on:click={attemptPlayback}>
+<article on:click={attemptPlayback} class:hidden>
   {#if duration != 0}
     <ProgressBar {duration} finishedCallback={onTrackFinished} />
   {/if}

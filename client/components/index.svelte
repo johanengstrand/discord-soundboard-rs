@@ -4,8 +4,8 @@
   import Notifications from './notifications';
 
   import { fetchTracks } from '../api';
-  import { currentCategories } from '../store';
   import { ROOT_CATEGORY } from '../constants';
+  import { allTracks, filteredTracks, currentCategories } from '../store';
 
   async function fetchAndParseTracks() {
     const tracks = await fetchTracks();
@@ -26,7 +26,10 @@
       }
     }
 
+    allTracks.set(tracks);
+    filteredTracks.set(tracks);
     currentCategories.set(parsedCategories);
+
     return tracks;
   }
 </script>

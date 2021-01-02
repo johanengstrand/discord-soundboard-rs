@@ -1,12 +1,31 @@
 <script>
+  import {
+    allTracks,
+    filterQuery,
+    filteredTracks,
+    currentCategories,
+  } from '../../store';
+
+  import {
+    createCustomQuery,
+    createEmptyQuery,
+    categoryFiltering,
+    customFiltering
+  } from '../../filtering';
+
   import debounce from '../../debounce';
-  import { createEmptyQuery, createCustomQuery } from '../../filtering';
-  import { filterQuery, currentNavItem, currentCategories } from '../../store';
+  import { QUERY_TYPE } from '../../constants';
 
   let active = false;
+  let previousQuery = '';
 
   const handleInput = debounce(e => {
+    const query = e.target.value;
     filterQuery.set(createCustomQuery(e.target.value));
+
+    if (query == '') {
+      active = false;
+    }
 	}, 125)
 
   function resetFilterQuery() {
@@ -14,7 +33,21 @@
   }
 
   filterQuery.subscribe(queryData => {
-    active = queryData.query != '';
+    if (!queryData || queryData.type == QUERY_TYPE.EMPTY) {
+      filteredTracks.set($allTracks);
+      active = false;
+      return;
+    }
+
+    const { type, query } = queryData;
+    if (type == QUERY_TYPE.CATEGORY) {
+      filteredTracks.set(categoryFiltering($allTracks, query, $currentCategories));
+    } else {
+      filteredTracks.set(customFiltering($allTracks, $filteredTracks, query, previousQuery));
+    }
+
+    previousQuery = query;
+    active = true;
   });
 </script>
 
@@ -46,7 +79,7 @@
 
 <div>
   <input type="text" placeholder="Filter tracks" on:input={handleInput} class:active value={$filterQuery.query} />
-  {#if $filterQuery.query != ''}
+  {#if active}
     <button on:click={resetFilterQuery}>&#10799;</button>
   {/if}
 </div>

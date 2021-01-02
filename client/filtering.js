@@ -59,7 +59,5 @@ export function customFiltering(tracks, currentTracks, query, previousQuery) {
     return false;
   });
 
-  console.log(filteredTracks);
-
   return filteredTracks;
 }
