@@ -57,46 +57,62 @@ pub fn create(
     let bot_state_filter = warp::any().map(move || bot_state.clone());
 
     let join = warp::post()
-        .and(warp::path!("api" / "join"))
+        .and(warp::path("api"))
+        .and(warp::path("join"))
+        .and(warp::path::end())
         .and(ctx_filter.clone())
         .and(songbird_filter.clone())
         .and(bot_state_filter.clone())
         .and_then(api::handlers::join);
 
     let leave = warp::post()
-        .and(warp::path!("api" / "leave"))
+        .and(warp::path("api"))
+        .and(warp::path("leave"))
+        .and(warp::path::end())
         .and(songbird_filter.clone())
         .and(bot_state_filter.clone())
         .and_then(api::handlers::leave);
 
     let connected = warp::get()
-        .and(warp::path!("api" / "connected"))
+        .and(warp::path("api"))
+        .and(warp::path("connected"))
+        .and(warp::path::end())
         .and(bot_state_filter.clone())
         .and_then(api::handlers::connected);
 
     let tracks = warp::get()
-        .and(warp::path!("api" / "tra"))
+        .and(warp::path("api"))
+        .and(warp::path("tracks"))
+        .and(warp::path::end())
         .and_then(api::handlers::tracks);
 
     let play = warp::post()
-        .and(warp::path!("api" / "play"))
+        .and(warp::path("api"))
+        .and(warp::path("play"))
+        .and(warp::path::end())
         .and(bot_state_filter.clone())
         .and(json_body())
         .and_then(api::handlers::play);
 
     let stop = warp::post()
-        .and(warp::path!("api" / "stop"))
+        .and(warp::path("api"))
+        .and(warp::path("stop"))
+        .and(warp::path::end())
         .and(bot_state_filter.clone())
         .and(json_body())
         .and_then(api::handlers::stop);
 
     let favorite = warp::post()
-        .and(warp::path!("api" / "favorite"))
+        .and(warp::path("api"))
+        .and(warp::path("favorite"))
+        .and(warp::path::end())
         .and(json_body())
         .and_then(api::handlers::favorite);
 
     let unfavorite = warp::post()
-        .and(warp::path!("api" / "unfavorite"))
+        .and(warp::path("api"))
+        .and(warp::path("unfavorite"))
+        .and(warp::path::end())
         .and(json_body())
         .and_then(api::handlers::unfavorite);
 
