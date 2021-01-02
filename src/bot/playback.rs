@@ -15,9 +15,17 @@ use songbird::{
     },
 };
 
+#[derive(Debug)]
 pub enum CachedSound {
     Compressed(Compressed),
     Uncompressed(Memory),
+}
+
+#[derive(Debug)]
+pub struct CachedTrack {
+    pub source: CachedSound,
+    pub duration: u128,
+    pub handle: Option<TrackHandle>,
 }
 
 impl From<&CachedSound> for Input {
@@ -33,12 +41,6 @@ impl From<&CachedSound> for Input {
     }
 }
 
-pub struct CachedTrack {
-    pub source: CachedSound,
-    pub duration: u128,
-    pub handle: Option<TrackHandle>,
-}
-
 impl CachedTrack {
     pub fn new(source: CachedSound, duration: u128) -> Self {
         CachedTrack {
@@ -48,10 +50,36 @@ impl CachedTrack {
         }
     }
 
+    /// Plays a track by source in an active call and
+    /// updates the `handle` field with the recieved `TrackHandle`.
+    ///
+    /// # Safety note
+    /// The source field must not have been changed or deleted after creation
+    /// and `call` must be an active mutable reference to a on-going discord voice call.
+    ///
+    /// # Example
+    /// ```rust
+    /// let cached_track = CachedTrack::new(CachedSound::new(memory), duration);
+    /// cached_track.play(&mut call); // converts the source, plays the track and stores the handle
+    /// ```
     pub fn play(&mut self, call: &mut Call) {
         self.handle = Some(call.play_source((&self.source).into()));
     }
 
+    /// Stops the playback of the track if it has a valid track handle.
+    ///
+    /// # Safety note
+    /// The source field must not have been changed or deleted after creation
+    /// and `call` must be an active mutable reference to a on-going discord voice call.
+    ///
+    /// # Example
+    /// ```rust
+    /// let cached_track = CachedTrack::new(CachedSound::new(memory), duration);
+    /// cached_track.play(&mut call);
+    /// ...
+    /// // lookup the cached track from e.g a HashMap
+    /// cached_track.stop();
+    /// ```
     pub async fn stop(&mut self) -> Result<(), String> {
         match &self.handle {
             Some(track_handle) => {
@@ -77,6 +105,7 @@ impl CachedTrack {
     }
 }
 
+/// Plays a song by path in the currently active discord voice call (if any).
 pub async fn play(bot_state_lock: &mut bot::State, path: &String)
     -> Result<u128, String> {
     match &bot_state_lock.current_call {
@@ -110,6 +139,7 @@ pub async fn play(bot_state_lock: &mut bot::State, path: &String)
     }
 }
 
+/// Stops the playback of a track by path in the current discord voice call.
 pub async fn stop(cached_tracks: &mut HashMap<String, CachedTrack>, path: &String) -> Result<(), String> {
     match cached_tracks.get_mut(path) {
         None => Err(format!("The track is not playing: {}", path)),

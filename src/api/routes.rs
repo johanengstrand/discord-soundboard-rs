@@ -1,101 +1,114 @@
 use crate::bot;
-use crate::CONFIG;
-
+use crate::api;
 use std::sync::Arc;
+use warp::Filter;
 use tokio::sync::Mutex;
 use songbird::Songbird;
 use serenity::CacheAndHttp;
 
-pub async fn join(ctx: Arc<CacheAndHttp>, manager: Arc<Songbird>, bot_state: Arc<Mutex<bot::State>>)
-    -> Result<impl warp::Reply, warp::Rejection> {
-    match bot::guilds::get_current_voice_channel(ctx).await {
-        Ok(Some(data)) => {
-            let (call_handle, join_result) = manager.join(data.guild_id, data.channel_id).await;
-            match join_result {
-                Ok(_) => {
-                    let mut bot_state_lock = bot_state.lock().await;
-                    bot_state_lock.current_guild_id = Some(data.guild_id);
-                    bot_state_lock.current_call = Some(call_handle.clone());
-                    return success!("Joined channel!")
-                },
-                Err(why) => failure!(format!("Could not join channel ({})", why)),
-
-            }
-        },
-        Ok(None) => failure!(format!("You are not connected to a voice channel")),
-        Err(why) => failure!(format!("Could not join channel: {}", why)),
-    }
+/// Warp filter for extracting JSON data from requests.
+/// This filter extracts a `String` and will return an invalid status code
+/// if the request body is invalid.
+///
+/// # Example
+/// ```rust
+/// let route = warp::post()
+///     .and(warp::path("api"))
+///     .and(warp::path("endpoint"))
+///     .and(warp::path::end())
+///     .and(json_body())
+///     .and_then(handle_route);
+/// ...
+/// // The function `handle_route` will now take one parameter of type `String`
+/// pub async fn handle_route(data: String) {...}
+/// ```
+fn json_body() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Clone {
+    warp::body::content_length_limit(1024 * 16).and(warp::body::json())
 }
 
-pub async fn leave(manager: Arc<Songbird>, bot_state: Arc<Mutex<bot::State>>)
-    -> Result<impl warp::Reply, warp::Rejection> {
-    let mut bot_state_lock = bot_state.lock().await;
-    match bot_state_lock.current_guild_id {
-        Some(guild_id) => {
-            match manager.leave(guild_id).await {
-                Ok(_) => {
-                    bot_state_lock.current_guild_id = None;
-                    bot_state_lock.current_call = None;
-                    success!("Left channel")
-                },
-                Err(why) => failure!(format!("Could not leave channel ({})", why)),
-            }
-        },
-        None => failure!("The bot is not currently connected to a voice channel"),
-    }
-}
+/// Creates a filter containing all available routes and registers the
+/// data filters and paths for each route handler.
+///
+/// # Arguments
+/// * `bot_state` - The empty bot state
+/// * `songbird` - The Songbird instance registered to serenity
+/// * `ctx` - The CacheAndHttp instance of the created serenity client
+///
+/// # Example
+/// ```rust
+/// let routes = api::routes::create(
+///     bot_state.clone(),
+///     songbird.clone(),
+///     ctx.clone()
+/// );
+///
+/// warp::serve(routes)
+///     .run(([0, 0, 0, 0], 8000))
+///     .await;
+///
+/// ```
+pub fn create(
+    bot_state: Arc<Mutex<bot::State>>,
+    songbird: Arc<Songbird>,
+    ctx: Arc<CacheAndHttp>
+) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+    let ctx_filter = warp::any().map(move || ctx.clone());
+    let songbird_filter = warp::any().map(move || songbird.clone());
+    let bot_state_filter = warp::any().map(move || bot_state.clone());
 
-pub async fn connected(bot_state: Arc<Mutex<bot::State>>)
-    -> Result<impl warp::Reply, warp::Rejection> {
-    match bot_state.lock().await.current_call {
-        Some(_) => success!(true),
-        None => success!(false),
-    }
-}
+    let join = warp::post()
+        .and(warp::path!("api" / "join"))
+        .and(ctx_filter.clone())
+        .and(songbird_filter.clone())
+        .and(bot_state_filter.clone())
+        .and_then(api::handlers::join);
 
-pub async fn tracks() -> Result<impl warp::Reply, warp::Rejection> {
-    let track_list = bot::tracks::get_tracks_in_dir(&CONFIG.folder);
+    let leave = warp::post()
+        .and(warp::path!("api" / "leave"))
+        .and(songbird_filter.clone())
+        .and(bot_state_filter.clone())
+        .and_then(api::handlers::leave);
 
-    match track_list {
-        Ok(tracks) => success!(tracks),
-        Err(why) => failure!(format!("Failed to get tracks: {}", why)),
-    }
-}
+    let connected = warp::get()
+        .and(warp::path!("api" / "connected"))
+        .and(bot_state_filter.clone())
+        .and_then(api::handlers::connected);
 
-pub async fn play(bot_state: Arc<Mutex<bot::State>>, path: String)
-    -> Result<impl warp::Reply, warp::Rejection> {
-    let mut bot_state_lock = bot_state.lock().await;
+    let tracks = warp::get()
+        .and(warp::path!("api" / "tra"))
+        .and_then(api::handlers::tracks);
 
-    match bot::playback::play(&mut bot_state_lock, &path).await {
-        // serde_json does not support u128? Casting to u64 works
-        Ok(duration) => success!(duration as u64),
-        Err(why) => failure!(format!("Failed to play track: {}", why)),
-    }
-}
+    let play = warp::post()
+        .and(warp::path!("api" / "play"))
+        .and(bot_state_filter.clone())
+        .and(json_body())
+        .and_then(api::handlers::play);
 
-pub async fn stop(bot_state: Arc<Mutex<bot::State>>, path: String) -> Result<impl warp::Reply, warp::Rejection> {
-    let mut bot_state_lock = bot_state.lock().await;
+    let stop = warp::post()
+        .and(warp::path!("api" / "stop"))
+        .and(bot_state_filter.clone())
+        .and(json_body())
+        .and_then(api::handlers::stop);
 
-    match bot::playback::stop(&mut bot_state_lock.cached_tracks, &path).await {
-        Ok(_) => success!(format!("Stopped track: {}", path)),
-        Err(why) => failure!(format!("Failed to stop track: {}", why)),
-    }
-}
+    let favorite = warp::post()
+        .and(warp::path!("api" / "favorite"))
+        .and(json_body())
+        .and_then(api::handlers::favorite);
 
-pub async fn favorite(track: String) -> Result<impl warp::Reply, warp::Rejection> {
-    let track_list = bot::tracks::get_tracks_in_dir(&CONFIG.folder);
+    let unfavorite = warp::post()
+        .and(warp::path!("api" / "unfavorite"))
+        .and(json_body())
+        .and_then(api::handlers::unfavorite);
 
-    match track_list {
-        Ok(_) => success!(format!("Favorited track: {}", track)),
-        Err(why) => failure!(format!("Failed to add to favorites: {}", why)),
-    }
-}
+    let public = warp::fs::dir("public");
 
-pub async fn unfavorite(track: String) -> Result<impl warp::Reply, warp::Rejection> {
-    let track_list = bot::tracks::get_tracks_in_dir(&CONFIG.folder);
-
-    match track_list {
-        Ok(_) => success!(format!("Unfavorited track: {}", track)),
-        Err(why) => failure!(format!("Failed to remove from favorites: {}", why)),
-    }
+    public
+        .or(join)
+        .or(leave)
+        .or(connected)
+        .or(play)
+        .or(stop)
+        .or(tracks)
+        .or(favorite)
+        .or(unfavorite)
 }

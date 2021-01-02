@@ -6,7 +6,6 @@ extern crate serde_json;
 #[macro_use] extern crate lazy_static;
 
 use std::process;
-use warp::Filter;
 use songbird::Songbird;
 use serenity::client::Client;
 
@@ -15,6 +14,16 @@ mod bot;
 mod settings;
 
 lazy_static! {
+    /// Global configuration store.
+    /// Contains the data read from `config.json` and can be imported
+    /// and used without any initilization since it is static.
+    ///
+    /// # Example
+    /// ```rust
+    /// use crate::CONFIG;
+    /// ...
+    /// let track_list = bot::tracks::get_tracks_in_dir(&CONFIG.folder);
+    /// ```
     static ref CONFIG: settings::Settings = match settings::Settings::new() {
         Err(why) => {
             println!("Failed to parse configuration file ({})", why);
@@ -24,96 +33,26 @@ lazy_static! {
     };
 }
 
-fn json_body() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Clone {
-    warp::body::content_length_limit(1024 * 16).and(warp::body::json())
-}
-
 #[tokio::main]
 async fn start() {
-    let songbird = Songbird::serenity();
-    let mut client = songbird::serenity::register_with(Client::builder(&CONFIG.token), songbird.clone())
-        .await
-        .expect("Failed to create discord client");
-
-    let ctx = client.cache_and_http.clone();
+    // Create a new instance of Songbird to be used with serenity and saved into a filter
     let bot_state = bot::State::new();
+    let songbird = Songbird::serenity();
+
+    let mut client = songbird::serenity::register_with(
+        Client::builder(&CONFIG.token),
+        songbird.clone()
+    ).await.expect("Failed to create discord client");
+
+    // The HTTP client is used to find the current voice channel of the user
+    let ctx = client.cache_and_http.clone();
 
     tokio::spawn(async move {
-        let ctx_filter = warp::any().map(move || ctx.clone());
-        let songbird_filter = warp::any().map(move || songbird.clone());
-        let bot_state_filter = warp::any().map(move || bot_state.clone());
-
-        let join = warp::post()
-            .and(warp::path("api"))
-            .and(warp::path("join"))
-            .and(warp::path::end())
-            .and(ctx_filter.clone())
-            .and(songbird_filter.clone())
-            .and(bot_state_filter.clone())
-            .and_then(api::routes::join);
-
-        let leave = warp::post()
-            .and(warp::path("api"))
-            .and(warp::path("leave"))
-            .and(warp::path::end())
-            .and(songbird_filter.clone())
-            .and(bot_state_filter.clone())
-            .and_then(api::routes::leave);
-
-        let connected = warp::get()
-            .and(warp::path("api"))
-            .and(warp::path("connected"))
-            .and(warp::path::end())
-            .and(bot_state_filter.clone())
-            .and_then(api::routes::connected);
-
-        let tracks = warp::get()
-            .and(warp::path("api"))
-            .and(warp::path("tracks"))
-            .and(warp::path::end())
-            .and_then(api::routes::tracks);
-
-        let play = warp::post()
-            .and(warp::path("api"))
-            .and(warp::path("play"))
-            .and(warp::path::end())
-            .and(bot_state_filter.clone())
-            .and(json_body())
-            .and_then(api::routes::play);
-
-        let stop = warp::post()
-            .and(warp::path("api"))
-            .and(warp::path("stop"))
-            .and(warp::path::end())
-            .and(bot_state_filter.clone())
-            .and(json_body())
-            .and_then(api::routes::stop);
-
-        let favorite = warp::post()
-            .and(warp::path("api"))
-            .and(warp::path("favorite"))
-            .and(warp::path::end())
-            .and(json_body())
-            .and_then(api::routes::favorite);
-
-        let unfavorite = warp::post()
-            .and(warp::path("api"))
-            .and(warp::path("unfavorite"))
-            .and(warp::path::end())
-            .and(json_body())
-            .and_then(api::routes::unfavorite);
-
-        let public = warp::fs::dir("public");
-
-        let routes = public
-            .or(join)
-            .or(leave)
-            .or(connected)
-            .or(play)
-            .or(stop)
-            .or(tracks)
-            .or(favorite)
-            .or(unfavorite);
+        let routes = api::routes::create(
+            bot_state.clone(),
+            songbird.clone(),
+            ctx.clone()
+        );
 
         warp::serve(routes)
             .run(([0, 0, 0, 0], 8000))
