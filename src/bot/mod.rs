@@ -1,5 +1,11 @@
-use songbird::Call;
-use std::sync::Arc;
+use songbird::{
+    Call,
+    tracks::TrackHandle,
+};
+use std::{
+    sync::Arc,
+    collections::HashMap,
+};
 use tokio::sync::Mutex;
 
 pub mod tracks;
@@ -9,6 +15,7 @@ pub mod playback;
 pub struct State {
     pub current_guild_id: Option<u64>,
     pub current_call: Option<Arc<Mutex<Call>>>,
+    pub current_tracks: HashMap<String, TrackHandle>,
 }
 
 impl State {
@@ -17,6 +24,7 @@ impl State {
             State {
                 current_guild_id: None,
                 current_call: None,
+                current_tracks: HashMap::new(),
             }
         ))
     }

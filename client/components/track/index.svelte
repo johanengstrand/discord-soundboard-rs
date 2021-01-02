@@ -23,8 +23,9 @@
 
     // TODO: Handle response from API call
     if ($currentTrack == track.name) {
-      stopTrack();
+      stopTrack(track.path);
       currentTrack.set(null);
+      duration = 0;
     } else {
       try {
         duration = await playTrack(track.path);

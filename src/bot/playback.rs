@@ -1,32 +1,23 @@
+use crate::bot;
+
 use std::{
     collections::HashMap,
     convert::TryInto,
     sync::Arc,
-    time::Duration,
 };
 
 use serenity::{
-    async_trait,
-    client::{Client, Context, EventHandler},
-    model::{channel::Message, gateway::Ready, misc::Mentionable},
-    prelude::{Mutex, TypeMapKey, SerenityError},
-    Result as SerenityResult,
+    client::Client,
+    prelude::{Mutex, TypeMapKey},
 };
 
 use songbird::{
+    tracks::TrackHandle,
     input::{
         self,
         cached::{Compressed, Memory},
         Input,
     },
-    Songbird,
-    Bitrate,
-    Call,
-    Event,
-    EventContext,
-    EventHandler as VoiceEventHandler,
-    SerenityInit,
-    TrackEvent,
 };
 
 enum CachedSound {
@@ -58,19 +49,51 @@ pub async fn setup(client: &mut Client) {
     data.insert::<SoundStore>(Arc::new(Mutex::new(audio_map)));
 }
 
-pub async fn play(call_lock: Arc<Mutex<Call>>, path: &String) -> Result<u128, SerenityError> {
-    let mut call = call_lock.lock().await;
-    let source = input::ffmpeg(path).await.expect("File should be in root folder.");
-    let duration = source.metadata.duration;
-    let ting_src = Memory::new(source).expect("These parameters are well-defined.");
-    let _ = ting_src.raw.spawn_loader();
-    let cached_track = CachedSound::Uncompressed(ting_src);
-    // audio_map.insert("ting".into(), CachedSound::Uncompressed(ting_src));
-    let song = call.play_source((&cached_track).into());
+pub async fn play(bot_state_lock: &mut bot::State, path: &String)
+    -> Result<u128, String> {
+    match &bot_state_lock.current_call {
+        Some(call_lock) => {
+            let mut call = call_lock.lock().await;
+            let source = input::ffmpeg(path).await.expect("File should be in root folder.");
+            let duration = source.metadata.duration;
+            let ting_src = Memory::new(source).expect("These parameters are well-defined.");
+            let _ = ting_src.raw.spawn_loader();
+            let cached_track = CachedSound::Uncompressed(ting_src);
+            let song = call.play_source((&cached_track).into());
+            bot_state_lock.current_tracks.insert(path.to_string(), song);
 
-    match duration {
-        None => Ok(0),
-        Some(duration) => Ok(duration.as_millis()),
+            match duration {
+                None => Ok(0),
+                Some(duration) => Ok(duration.as_millis()),
+            }
+        },
+        None => Err(String::from("The bot is not currently connected to a voice channel")),
     }
+
 }
 
+pub async fn stop(current_tracks: &mut HashMap<String, TrackHandle>, path: &String) -> Result<(), String> {
+    let track = current_tracks.get(path);
+
+    match track {
+        Some(track) => {
+            let track_state = track.get_info().await;
+            match track_state {
+                Ok(state) => {
+                    if !state.playing.is_done() {
+                        // TODO: Add error handling
+                        return match track.stop() {
+                            Ok(_) => Ok(()),
+                            Err(why) => Err(format!("Could not stop track: {}", why)),
+                        };
+                    }
+
+                    current_tracks.remove(path);
+                    Ok(())
+                },
+                Err(why) => Err(format!("Could not fetch track state: {}", why)),
+            }
+        },
+        None => Err(format!("The track is not playing: {}", path)),
+    }
+}

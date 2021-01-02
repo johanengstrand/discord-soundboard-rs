@@ -62,22 +62,24 @@ pub async fn tracks() -> Result<impl warp::Reply, warp::Rejection> {
     }
 }
 
-pub async fn play(manager: Arc<Songbird>, bot_state: Arc<Mutex<bot::State>>, track: String)
+pub async fn play(bot_state: Arc<Mutex<bot::State>>, path: String)
     -> Result<impl warp::Reply, warp::Rejection> {
-    match &bot_state.lock().await.current_call {
-        Some(call_lock) => {
-            match bot::playback::play(call_lock.clone(), &track).await {
-                // serde_json does not support u128? Casting to u64 works
-                Ok(duration) => success!(duration as u64),
-                Err(why) => failure!(format!("Failed to play track: {}", why)),
-            }
-        },
-        None => failure!("The bot is not currently connected to a voice channel"),
+    let mut bot_state_lock = bot_state.lock().await;
+
+    match bot::playback::play(&mut bot_state_lock, &path).await {
+        // serde_json does not support u128? Casting to u64 works
+        Ok(duration) => success!(duration as u64),
+        Err(why) => failure!(format!("Failed to play track: {}", why)),
     }
 }
 
-pub async fn stop() -> Result<impl warp::Reply, warp::Rejection> {
-    success!("Not implemented")
+pub async fn stop(bot_state: Arc<Mutex<bot::State>>, path: String) -> Result<impl warp::Reply, warp::Rejection> {
+    let mut bot_state_lock = bot_state.lock().await;
+
+    match bot::playback::stop(&mut bot_state_lock.current_tracks, &path).await {
+        Ok(_) => success!(format!("Stopped track: {}", path)),
+        Err(why) => failure!(format!("Failed to stop track: {}", why)),
+    }
 }
 
 pub async fn favorite(track: String) -> Result<impl warp::Reply, warp::Rejection> {

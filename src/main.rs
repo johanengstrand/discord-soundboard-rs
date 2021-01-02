@@ -5,12 +5,8 @@ extern crate serde_json;
 #[macro_use] extern crate serde;
 #[macro_use] extern crate lazy_static;
 
+use std::process;
 use warp::Filter;
-use std::{
-    process,
-    sync::Arc,
-};
-use tokio::sync::RwLock;
 use songbird::Songbird;
 use serenity::client::Client;
 
@@ -83,7 +79,6 @@ async fn start() {
             .and(warp::path("api"))
             .and(warp::path("play"))
             .and(warp::path::end())
-            .and(songbird_filter.clone())
             .and(bot_state_filter.clone())
             .and(json_body())
             .and_then(api::routes::play);
@@ -92,6 +87,8 @@ async fn start() {
             .and(warp::path("api"))
             .and(warp::path("stop"))
             .and(warp::path::end())
+            .and(bot_state_filter.clone())
+            .and(json_body())
             .and_then(api::routes::stop);
 
         let favorite = warp::post()

@@ -78,8 +78,8 @@ export async function playTrack(path) {
 /// @brief Stops the playback of a track
 /// @throws Error if the current track could not be stopped
 /// @returns nothing
-export async function stopTrack() {
-  return await post('stop', {});
+export async function stopTrack(path) {
+  return await post('stop', path);
 }
 
 /// @brief Favorites a track and saves it on the server
