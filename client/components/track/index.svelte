@@ -5,7 +5,7 @@
     favoriteTrack,
     unfavoriteTrack,
   } from '../../api';
-  import { currentTrack, currentCategories, hasJoined } from '../../store';
+  import { currentCategories, hasJoined } from '../../store';
   import { FAVORITES_CATEGORY } from '../../constants';
 
   import ProgressBar from './progress-bar';
@@ -22,14 +22,12 @@
     }
 
     // TODO: Handle response from API call
-    if ($currentTrack == track.name) {
+    if (duration != 0) {
       stopTrack(track.path);
-      currentTrack.set(null);
       duration = 0;
     } else {
       try {
         duration = await playTrack(track.path);
-        currentTrack.set(track.name);
       } catch (e) {}
     }
 
@@ -64,13 +62,8 @@
   }
 
   function onTrackFinished() {
-    currentTrack.set(null);
     duration = 0;
   }
-
-  currentTrack.subscribe(name => {
-    active = name == track.name;
-  });
 
   hasJoined.subscribe(connected => {
     if (!connected) {
@@ -78,7 +71,7 @@
     }
   });
 
-  active = $currentTrack == track.name;
+  active = duration != 0;
   favorite = track.categories.includes(FAVORITES_CATEGORY);
 
   // This will stop the track name from being substringed on each render
