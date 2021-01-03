@@ -1,13 +1,16 @@
-use std::fs;
-use std::path::PathBuf;
-use std::io::{self, Error, ErrorKind};
+use std::{
+    fs,
+    path::PathBuf,
+    ffi::OsString,
+    io::{self, Error, ErrorKind},
+};
 
 #[derive(Debug, Serialize)]
 pub struct Track {
-    name: String,
-    categories: Vec<PathBuf>,
-    collections: Vec<PathBuf>,
-    path: PathBuf,
+    pub name: String,
+    pub categories: Vec<PathBuf>,
+    pub collections: Vec<String>,
+    pub path: PathBuf,
 }
 
 impl Track {
@@ -16,12 +19,17 @@ impl Track {
             name,
             categories,
             collections: Vec::new(),
-            path
+            path,
         }
     }
 
     pub fn add_collection(&mut self, collection: PathBuf) {
-        self.collections.push(collection);
+        // TODO: Cleanup this mess
+        if let Some(collection_name) = collection.file_stem() {
+            if let Ok(name) = collection_name.to_os_string().into_string() {
+                self.collections.push(name);
+            }
+        }
     }
 }
 

@@ -30,34 +30,28 @@ impl Collection {
     }
 }
 
-fn read_collection(tracks: &mut Vec<Track>, path: &PathBuf) {
-    if let Ok(collection) = Collection::new(path) {
-        // TODO: Go through each track path in the collection and check if it is in tracks.
-        //       If so, call track.add_collection(<name of collection>);
+// TODO: Add error handling
+fn add_collection_to_track(tracks: &mut Vec<Track>, collection_name: &PathBuf) {
+    // TODO: Error handling
+    if let Ok(collection) = Collection::new(collection_name) {
+        for path in collection.tracks.iter() {
+            for track in tracks.iter_mut() {
+                if track.path == *path {
+                    track.add_collection(collection_name.to_path_buf());
+                    break;
+                }
+            }
+        }
     }
 }
 
-pub fn add_collections_to_tracks(tracks: &mut Vec<Track>) {
+pub fn add_collections_to_tracks(tracks: &mut Vec<Track>) -> Result<(), std::io::Error> {
     // TODO: Find and loop through all collections with read_collection
-    // if dir.is_dir() {
-    //     for entry in fs::read_dir(dir)? {
-    //         let entry = entry?;
-    //         let path = entry.path();
-    //         let name = entry.file_name().into_string()
-    //             .expect("Could not convert file name to string");
-    //         if name.get(0..1) != Some(".") {
-    //             if path.is_dir() {
-    //                 visit_dirs(&path, &category.join(name), tracks)?;
-    //             } else {
-    //                 // TODO: Add 'favorites' category if track is a favorite
-    //                 let keyword = category.to_path_buf();
-    //                 let categories = vec!(keyword);
-    //                 tracks.push(Track { name, categories, path });
-    //             }
-    //         }
-    //     }
-    //     Ok(())
-    // } else {
-    //     Err(Error::new(ErrorKind::NotFound, "No such path"))
-    // }
+    for collection in fs::read_dir(PathBuf::from("config/collections"))? {
+        let collection = collection?;
+        // TODO: Add error handling
+        add_collection_to_track(tracks, &collection.path());
+    }
+
+    Ok(())
 }
