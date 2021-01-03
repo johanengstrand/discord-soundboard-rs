@@ -6,7 +6,23 @@ use std::io::{self, Error, ErrorKind};
 pub struct Track {
     name: String,
     categories: Vec<PathBuf>,
+    collections: Vec<PathBuf>,
     path: PathBuf,
+}
+
+impl Track {
+    pub fn new(name: String, categories: Vec<PathBuf>, path: PathBuf) -> Self {
+        Track {
+            name,
+            categories,
+            collections: Vec::new(),
+            path
+        }
+    }
+
+    pub fn add_collection(&mut self, collection: PathBuf) {
+        self.collections.push(collection);
+    }
 }
 
 fn visit_dirs(dir: &PathBuf, category: &PathBuf, tracks: &mut Vec<Track>) -> io::Result<()> {
@@ -23,7 +39,7 @@ fn visit_dirs(dir: &PathBuf, category: &PathBuf, tracks: &mut Vec<Track>) -> io:
                     // TODO: Add 'favorites' category if track is a favorite
                     let keyword = category.to_path_buf();
                     let categories = vec!(keyword);
-                    tracks.push(Track { name, categories, path });
+                    tracks.push(Track::new(name, categories, path));
                 }
             }
         }
