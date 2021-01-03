@@ -3,7 +3,7 @@
     allTracks,
     filterQuery,
     filteredTracks,
-    currentCategories,
+    currentFilters,
   } from '../../store';
 
   import {
@@ -41,7 +41,7 @@
 
     const { type, query } = queryData;
     if (type == QUERY_TYPE.CATEGORY) {
-      filteredTracks.set(categoryFiltering($allTracks, query, $currentCategories));
+      filteredTracks.set(categoryFiltering($allTracks, query, $currentFilters));
     } else {
       filteredTracks.set(customFiltering($allTracks, $filteredTracks, query, previousQuery));
     }

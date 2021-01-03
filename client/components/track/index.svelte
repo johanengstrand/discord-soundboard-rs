@@ -7,7 +7,7 @@
   } from '../../api';
   import { FAVORITES_CATEGORY } from '../../constants';
   import { createNotification } from '../../notifications';
-  import { filteredTracks, currentCategories, hasJoined } from '../../store';
+  import { filteredTracks, currentFilters, hasJoined } from '../../store';
 
   import ProgressBar from './progress-bar';
   import TrackCategories from './categories';
@@ -41,7 +41,7 @@
   async function toggleFavorite(e) {
     // Prevent event propagation to 'attemptPlayback'
     e.stopPropagation();
-    const categories = $currentCategories;
+    const categories = $currentFilters;
 
     try {
       if (favorite) {
@@ -51,12 +51,12 @@
         categories[FAVORITES_CATEGORY] = categories[FAVORITES_CATEGORY].filter(favoritedTrack => {
           return favoritedTrack != track;
         });
-        currentCategories.set(categories);
+        currentFilters.set(categories);
         await unfavoriteTrack(track);
       } else {
         track.categories.push(FAVORITES_CATEGORY);
         categories[FAVORITES_CATEGORY].push(track);
-        currentCategories.set(categories);
+        currentFilters.set(categories);
         await favoriteTrack(track);
       }
     } catch (e) {
@@ -174,7 +174,7 @@
   <div class="content">
     <section class="metadata">
       <h4>{trackName}</h4>
-      <TrackCategories categories={track.categories} />
+      <TrackCategories categories={track.categories} collections={track.collections} />
     </section>
     <div class="favorite-wrapper" on:click={toggleFavorite} class:active>
       <svg class="w-6 h-6"

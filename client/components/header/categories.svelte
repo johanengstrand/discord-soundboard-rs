@@ -1,6 +1,6 @@
 <script>
   import Category from '../track/category';
-  import { currentCategories } from '../../store';
+  import { currentFilters } from '../../store';
 </script>
 
 <style>
@@ -24,7 +24,7 @@
 </style>
 
 <section>
-  {#each Object.keys($currentCategories) as category, i (category)}
+  {#each Object.keys($currentFilters) as category, i (category)}
     <Category list={true} label={category} fontSize='0.9rem'/>
   {/each}
 </section>

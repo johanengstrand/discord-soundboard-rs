@@ -2,7 +2,7 @@
   import Track from './track';
   import { QUERY_TYPE } from '../constants';
   import { customFiltering, categoryFiltering } from '../filtering';
-  import { currentCategories } from '../store';
+  import { currentFilters } from '../store';
 
   export let tracks;
 </script>

@@ -1,5 +1,5 @@
 export const ROOT_CATEGORY = 'misc';
-export const FAVORITES_CATEGORY = 'favorite';
+export const FAVORITES_CATEGORY = 'favorites';
 export const NAV_ITEM_CATEGORIES = 'Categories';
 export const NOTIFICATION_TIMEOUT = 4000;
 

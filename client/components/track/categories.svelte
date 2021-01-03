@@ -3,6 +3,7 @@
   import { ROOT_CATEGORY, FAVORITES_CATEGORY } from '../../constants';
 
   export let categories;
+  export let collections;
 </script>
 
 <style>
@@ -21,5 +22,8 @@
     {#if category != ''}
       <TrackCategory label={category} />
     {/if}
+  {/each}
+  {#each collections as collection, i (collection)}
+    <TrackCategory label={collection} />
   {/each}
 </section>

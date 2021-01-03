@@ -5,30 +5,37 @@
 
   import { fetchTracks } from '../api';
   import { ROOT_CATEGORY } from '../constants';
-  import { allTracks, filteredTracks, currentCategories } from '../store';
+  import { allTracks, filteredTracks, currentFilters } from '../store';
 
   async function fetchAndParseTracks() {
     const tracks = await fetchTracks();
-    const parsedCategories = {
-      favorite: [], // always create a favorites category even if empty
+    const parsedFilters = {
       [ROOT_CATEGORY]: [], // create a category for the tracks stored in the root folder (category='')
     };
 
     for (const track of tracks) {
       for (const category of track.categories) {
         if (category == '') {
-          parsedCategories[ROOT_CATEGORY].push(track);
-        } else if (parsedCategories.hasOwnProperty(category)) {
-          parsedCategories[category].push(track);
+          parsedFilters[ROOT_CATEGORY].push(track);
+        } else if (parsedFilters.hasOwnProperty(category)) {
+          parsedFilters[category].push(track);
         } else {
-          parsedCategories[category] = [track];
+          parsedFilters[category] = [track];
+        }
+      }
+
+      for (const collection of track.collections) {
+        if (parsedFilters.hasOwnProperty(collection)) {
+          parsedFilters[collection].push(track);
+        } else {
+          parsedFilters[collection] = [track];
         }
       }
     }
 
     allTracks.set(tracks);
     filteredTracks.set(tracks);
-    currentCategories.set(parsedCategories);
+    currentFilters.set(parsedFilters);
 
     return tracks;
   }
