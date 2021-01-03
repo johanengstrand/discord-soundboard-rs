@@ -54,11 +54,16 @@ pub async fn connected(bot_state: Arc<Mutex<bot::State>>)
     }
 }
 
+// TODO: If bot state contains non-empty hash map of tracks, return it instead
+// TODO: Add route for reloading the loaded tracks
 pub async fn tracks() -> Result<impl warp::Reply, warp::Rejection> {
     let track_list = bot::tracks::get_tracks_in_dir(&CONFIG.folder);
 
     match track_list {
-        Ok(tracks) => success!(tracks),
+        Ok(mut tracks) => {
+            bot::collections::add_collections_to_tracks(&mut tracks);
+            success!(tracks)
+        },
         Err(why) => failure!(format!("Failed to get tracks: {}", why)),
     }
 }
@@ -83,20 +88,18 @@ pub async fn stop(bot_state: Arc<Mutex<bot::State>>, path: String) -> Result<imp
     }
 }
 
-pub async fn favorite(track: String) -> Result<impl warp::Reply, warp::Rejection> {
-    let track_list = bot::tracks::get_tracks_in_dir(&CONFIG.folder);
-
-    match track_list {
-        Ok(_) => success!(format!("Favorited track: {}", track)),
-        Err(why) => failure!(format!("Failed to add to favorites: {}", why)),
-    }
+pub async fn favorite(path: String) -> Result<impl warp::Reply, warp::Rejection> {
+    success!(format!("Favorited track: {}", path))
+    // match track_list {
+    //     Ok(_) => success!(format!("Favorited track: {}", path)),
+    //     Err(why) => failure!(format!("Failed to add to favorites: {}", why)),
+    // }
 }
 
-pub async fn unfavorite(track: String) -> Result<impl warp::Reply, warp::Rejection> {
-    let track_list = bot::tracks::get_tracks_in_dir(&CONFIG.folder);
-
-    match track_list {
-        Ok(_) => success!(format!("Unfavorited track: {}", track)),
-        Err(why) => failure!(format!("Failed to remove from favorites: {}", why)),
-    }
+pub async fn unfavorite(path: String) -> Result<impl warp::Reply, warp::Rejection> {
+    success!(format!("Favorited track: {}", path))
+    // match track_list {
+    //     Ok(_) => success!(format!("Unfavorited track: {}", path)),
+    //     Err(why) => failure!(format!("Failed to remove from favorites: {}", why)),
+    // }
 }

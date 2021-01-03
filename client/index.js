@@ -1,7 +1,7 @@
-import App from './components/index.svelte';
+import App from "./components/index.svelte";
 
 const view = new App({
-	target: document.getElementById('app'),
+    target: document.getElementById("app"),
 });
 
 export default view;

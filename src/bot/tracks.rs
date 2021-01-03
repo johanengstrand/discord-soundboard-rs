@@ -1,12 +1,35 @@
-use std::fs;
-use std::path::PathBuf;
-use std::io::{self, Error, ErrorKind};
+use std::{
+    fs,
+    path::PathBuf,
+    ffi::OsString,
+    io::{self, Error, ErrorKind},
+};
 
 #[derive(Debug, Serialize)]
 pub struct Track {
-    name: String,
-    categories: Vec<PathBuf>,
-    path: PathBuf,
+    pub name: String,
+    pub categories: Vec<PathBuf>,
+    pub collections: Vec<String>,
+    pub path: PathBuf,
+}
+
+impl Track {
+    pub fn new(name: String, categories: Vec<PathBuf>, path: PathBuf) -> Self {
+        Track {
+            name,
+            categories,
+            collections: Vec::new(),
+            path,
+        }
+    }
+
+    pub fn add_collection(&mut self, collection: PathBuf) {
+        if let Some(collection_name) = collection.file_stem() {
+            if let Ok(name) = collection_name.to_os_string().into_string() {
+                self.collections.push(name);
+            }
+        }
+    }
 }
 
 fn visit_dirs(dir: &PathBuf, category: &PathBuf, tracks: &mut Vec<Track>) -> io::Result<()> {
@@ -20,10 +43,15 @@ fn visit_dirs(dir: &PathBuf, category: &PathBuf, tracks: &mut Vec<Track>) -> io:
                 if path.is_dir() {
                     visit_dirs(&path, &category.join(name), tracks)?;
                 } else {
-                    // TODO: Add 'favorites' category if track is a favorite
+                    let mut categories = Vec::new();
                     let keyword = category.to_path_buf();
-                    let categories = vec!(keyword);
-                    tracks.push(Track { name, categories, path });
+
+                    // Ignore the root category
+                    if keyword != PathBuf::from("") {
+                        categories.push(keyword);
+                    }
+
+                    tracks.push(Track::new(name, categories, path));
                 }
             }
         }
