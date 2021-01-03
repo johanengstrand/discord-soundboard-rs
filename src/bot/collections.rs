@@ -37,7 +37,7 @@ fn read_collection(tracks: &mut Vec<Track>, path: &PathBuf) {
     }
 }
 
-pub fn add_collections_to_tracks(tracks: &mut Vec<Track>) -> HashMap<PathBuf, Vec<PathBuf>> {
+pub fn add_collections_to_tracks(tracks: &mut Vec<Track>) {
     // TODO: Find and loop through all collections with read_collection
     // if dir.is_dir() {
     //     for entry in fs::read_dir(dir)? {
@@ -60,5 +60,4 @@ pub fn add_collections_to_tracks(tracks: &mut Vec<Track>) -> HashMap<PathBuf, Ve
     // } else {
     //     Err(Error::new(ErrorKind::NotFound, "No such path"))
     // }
-    HashMap::new()
 }
