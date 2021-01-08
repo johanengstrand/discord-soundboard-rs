@@ -58,6 +58,7 @@
             );
 
             currentFilters.set(filters);
+            favorite = true;
         } catch (e) {
             createNotification(e, true);
         }
@@ -69,6 +70,7 @@
             track.categories.push(FAVORITES_CATEGORY);
             categories[FAVORITES_CATEGORY].push(track);
             currentFilters.set(categories);
+            favorite = false;
         } catch (e) {
             createNotification(e, true);
         }
@@ -84,8 +86,6 @@
         } else {
             removeFavorite(filters);
         }
-
-        favorite = !favorite;
 
         // Trigger a rerender
         track = track;

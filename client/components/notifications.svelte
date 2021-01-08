@@ -2,9 +2,15 @@
     import { currentNotification } from "../store";
     import { NOTIFICATION_TIMEOUT } from "../constants";
 
+    let currentTimeout = null;
+
     currentNotification.subscribe((notification) => {
+        if (currentTimeout) {
+            clearTimeout(currentTimeout);
+        }
+
         if (notification) {
-            setTimeout(
+            currentTimeout = setTimeout(
                 () => currentNotification.set(null),
                 NOTIFICATION_TIMEOUT
             );
@@ -17,17 +23,19 @@
         width: 100%;
         height: auto;
         background-color: transparent;
-        position: absolute;
+        position: fixed;
         bottom: var(--spacing);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-end;
+        z-index: 1000;
     }
 
     p {
         padding: var(--spacing) calc(var(--spacing) * 1.5);
         font-weight: bold;
+        box-shadow: 1px 2px 20px rgba(0, 0, 0, 0.4);
     }
 
     p.error {
