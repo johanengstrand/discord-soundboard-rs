@@ -1,6 +1,8 @@
 use crate::bot;
 
 use std::{
+    thread::sleep,
+    time::Duration,
     collections::HashMap,
     convert::TryInto,
 };
@@ -103,6 +105,20 @@ impl CachedTrack {
             None => Err(String::from("The track is currently not playing")),
         }
     }
+
+    pub async fn await_playing(&self) {
+        if let Some(handle) = &self.handle {
+            if let Ok(state) = handle.get_info().await {
+                loop {
+                    if state.play_time.as_millis() > 0 {
+                        return;
+                    }
+
+                    sleep(Duration::from_millis(10));
+                }
+            }
+        }
+    }
 }
 
 /// Plays a song by path in the currently active discord voice call (if any).
@@ -125,6 +141,7 @@ pub async fn play(bot_state_lock: &mut bot::State, path: &String)
                     let mut cached_track = CachedTrack::new(CachedSound::Uncompressed(track_source), duration);
 
                     cached_track.play(&mut call);
+                    cached_track.await_playing().await;
                     bot_state_lock.cached_tracks.insert(path.clone(), cached_track);
 
                     Ok(duration)

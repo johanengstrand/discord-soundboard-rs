@@ -1,7 +1,6 @@
 use std::{
     fs,
     path::PathBuf,
-    ffi::OsString,
     io::{self, Error, ErrorKind},
 };
 

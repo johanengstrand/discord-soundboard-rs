@@ -1,11 +1,6 @@
 use crate::bot::tracks::Track;
+use std::{fs, path::PathBuf};
 use config::{Config, File, ConfigError};
-
-use std::{
-    fs,
-    path::PathBuf,
-    collections::HashMap,
-};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Collection {
