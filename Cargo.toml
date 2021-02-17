@@ -16,23 +16,18 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.59"
 config = "0.10"
 lazy_static = "1.4"
+openssl = { version = "0.10.29", features = ["vendored"] }
 
 [dependencies.songbird]
 git = "https://github.com/serenity-rs/songbird"
 branch = "current"
 
 [dependencies.serenity]
-version = "0.9.3"
-default_features = false
+version = "0.10.2"
 features = ["client", "gateway", "cache", "http", "model", "voice", "rustls_backend"]
 git = "https://github.com/serenity-rs/serenity"
 branch = "current"
 
 [dependencies.tokio]
-version = "0.2"
-features = ["macros"]
-
-[dependencies.rocket_contrib]
-version = "0.4.6"
-default-features = false
-features = ["json", "serve"]
+version = "1.0"
+features = ["macros", "rt-multi-thread"]
